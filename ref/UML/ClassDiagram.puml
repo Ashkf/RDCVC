@@ -1,0 +1,75 @@
+@startuml class_diagram
+class Trainer {
+    - args
+    - default_config
+    - logger: Logger
+    - train_loader: Dataloader
+    - val_loader: Dataloader
+    - model
+    - evaluator: Evaluator
+    - scaler
+    - optimizer
+    + train()
+    + train_per_epoch(index_epoch)
+    + val_per_epoch(epoch)
+    + compute_loss(metrics: dict) : torch.Tensor
+    + prepare_model()
+    + prepare_optimizer()
+    + prepare_scaler(save_dir)
+    + prepare_default_config() : config
+    + prepare_evaluator()
+}
+class Evaluator {
+    - model
+    - model_type: str
+    - dataloader: Dataloader
+    - logger: Logger
+    - is_train: bool
+    + eval()
+}
+class Logger {
+    - lgr
+    - writer
+    - recoder
+    - checkpoint
+    + log_args(args)
+    + create_SummaryWriter(args)
+    + show_tensorboard()
+    + tensor2img(tensor)
+    + record_scalar(name, value)
+    + save_curves(epoch)
+    + save_imgs(names2imgs, epoch)
+    + save_last(item, epoch)
+    + save_checkpoint(model, optimizer, epoch, step)
+    + save_final(model)
+    + load_logger(args)
+}
+class Recoder {
+    - metrics
+    + record(name, value)
+    + summary() : dict
+}
+
+class Checkpoint {
+    - checkpoint
+    + save(model_dir)
+}
+class Dataloader {}
+class ModelExecutor {
+   - model_type: str
+   - model
+   + forward(item, label):
+   + forward_mtl(item: dict[str, Tensor], label: dict[str, Tensor]):
+}
+Trainer --* Evaluator
+Trainer --* Dataloader
+Trainer --* Logger
+Trainer --> ModelExecutor
+Evaluator --* Dataloader
+Evaluator --> MetricsComputer
+Evaluator --> ModelExecutor
+Logger --> Recoder
+Logger --> Checkpoint
+@enduml
+
+

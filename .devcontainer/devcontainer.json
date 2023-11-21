@@ -1,0 +1,276 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "RDCVC_ENV",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "cnstark/pytorch:2.0.1-py3.10.11-cuda11.8.0-ubuntu22.04",
+	"runArgs": [
+		"--gpus=all",
+		"--shm-size=32g"
+	],
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+	"workspaceFolder": "/workspace",
+	"onCreateCommand": "pip install -r requirements.txt",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2.3.0": {
+			"username": "automatic",
+			"uid": "automatic",
+			"gid": "automatic"
+		},
+		"ghcr.io/devcontainers/features/git:1": "latest",
+		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+			"packages": [
+				"graphviz",
+				"build-essential"
+			]
+		}
+	},
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.black-formatter",
+				"svenzhao.var-translation",
+				"huacnlee.autocorrect",
+				"huibizhang.codesnap-plus",
+				"mkxml.vscode-filesize",
+				"GrapeCity.gc-excelviewer",
+				"tamasfe.even-better-toml",
+				"sourcery.sourcery",
+				"njqdev.vscode-python-typehint",
+				"charliermarsh.ruff",
+				"alexcvzz.vscode-sqlite",
+				"psioniq.psi-header",
+				"christian-kohler.path-intellisense",
+				"GitHub.copilot",
+				"stackbreak.comment-divider",
+				"vivaxy.vscode-conventional-commits",
+				"ms-toolsai.datawrangler",
+				"njpwerner.autodocstring",
+				"oderwat.indent-rainbow",
+				"ms-toolsai.jupyter",
+				"ms-toolsai.vscode-jupyter-powertoys",
+				"cweijan.vscode-mysql-client2",
+				"Gruntfuggly.todo-tree",
+				"redhat.vscode-yaml",
+				"jock.svg",
+				"jebbs.plantuml",
+				"yzhang.markdown-all-in-one",
+				"kisstkondoros.vscode-gutter-preview",
+				"mhutchie.git-graph",
+				"donjayamanne.githistory",
+				"codezombiech.gitignore",
+				"VisualStudioExptTeam.vscodeintellicode",
+				"draivin.hscopes"
+			],
+			"settings": {
+				"[python]": {
+					"editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.fixAll.ruff": true,
+						"source.organizeImports.ruff": true
+					},
+					"editor.formatOnType": true,
+					"editor.rulers": [
+						88
+					]
+				},
+				"editor.cursorStyle": "line",
+				"editor.inlineSuggest.enabled": true,
+				"editor.unicodeHighlight.allowedLocales": {
+					"zh-hant": true,
+					"zh-hans": true
+				},
+				"files.exclude": {
+					"**/.__pycache__": true,
+					"**/.csv": true,
+					"**/.parquet": true,
+					"**/.pkl": true,
+					"**/.xls": true
+				},
+				"todo-tree.highlights.useColourScheme": true,
+				"todo-tree.general.tags": [
+					"TODO",
+					"todo",
+					"!TEST",
+					"!test",
+					"BUG",
+					"HACK",
+					"FIXME",
+					"XXX",
+					"[ ]",
+					"[x]"
+				],
+				"window.commandCenter": true,
+				"conventionalCommits.editor.keepAfterSave": true,
+				"sqlite.logLevel": "DEBUG",
+				"github.copilot.enable": {
+					"*": true,
+					"plaintext": false,
+					"markdown": true,
+					"scminput": false,
+					"python": true
+				},
+				"git.openRepositoryInParentFolders": "always",
+				"editor.inlineSuggest.showToolbar": "always",
+				"vsintellicode.modify.editor.suggestSelection": "choseToUpdateConfiguration",
+				"comment-divider.length": 60,
+				"better-comments.tags": [
+					{
+						"tag": "!",
+						"color": "#FF2D00",
+						"strikethrough": false,
+						"underline": false,
+						"backgroundColor": "transparent",
+						"bold": false,
+						"italic": false
+					},
+					{
+						"tag": "?",
+						"color": "#3498DB",
+						"strikethrough": false,
+						"underline": false,
+						"backgroundColor": "transparent",
+						"bold": false,
+						"italic": false
+					},
+					{
+						"tag": "//",
+						"color": "#474747",
+						"strikethrough": true,
+						"underline": false,
+						"backgroundColor": "transparent",
+						"bold": false,
+						"italic": false
+					},
+					{
+						"tag": "todo",
+						"color": "#FF8C00",
+						"strikethrough": false,
+						"underline": false,
+						"backgroundColor": "transparent",
+						"bold": false,
+						"italic": false
+					},
+					{
+						"tag": "*",
+						"color": "#98C379",
+						"strikethrough": false,
+						"underline": false,
+						"backgroundColor": "transparent",
+						"bold": false,
+						"italic": false
+					}
+				],
+				"notebook.cellToolbarLocation": {
+					"default": "right",
+					"jupyter-notebook": "left"
+				},
+				"notebook.cellToolbarVisibility": "hover",
+				"notebook.consolidatedOutputButton": false,
+				"notebook.globalToolbarShowLabel": "dynamic",
+				"notebook.showCellStatusBar": "visibleAfterExecute",
+				"notebook.output.scrolling": true,
+				"notebook.stickyScroll.enabled": true,
+				"notebook.lineNumbers": "on",
+				"notebook.diff.overviewRuler": true,
+				"black-formatter.showNotifications": "always",
+				"editor.stickyScroll.enabled": true,
+				"svg.preview.mode": "svg",
+				"workbench.tree.indent": 24,
+				"python.analysis.diagnosticSeverityOverrides": {
+					"reportGeneralTypeIssues": "none",
+					"reportPropertyTypeMismatch": "none",
+					"reportUnboundVariable": "none",
+					"reportOptionalOperand": "none",
+					"reportOptionalCall": "none"
+				},
+				"diffEditor.ignoreTrimWhitespace": false,
+				"sourcery.codeLens": false,
+				/* ---------------- psi file header start --------------- */
+				"psi-header.config": {
+					"forceToTop": true,
+					"blankLinesAfter": 2,
+					"spacesBetweenYears": false,
+					// "license": "MIT",
+					"author": "Fan Kai",
+					"initials": "FK",
+					"authorEmail": "ifan.kai@outlook.com",
+					"company": "Soochow University",
+					"creationDateZero": "asIs"
+				},
+				"psi-header.changes-tracking": {
+					"isActive": true,
+					"modAuthor": "Modified By:",
+					"modDate": "Modified:",
+					"modDateFormat": "dd/MM/yyyy hh:nn:ss",
+					"autoHeader": "autoSave",
+					"include": [
+						"python"
+					],
+					"enforceHeader": true,
+					"replace": [
+						"Filename:",
+						"Project"
+					],
+					"updateLicenseVariables": false
+				},
+				"psi-header.lang-config": [
+					{
+						"language": "python",
+						"begin": "\"\"\"",
+						"end": "\"\"\"",
+						"prefix": "* "
+					}
+				],
+				"psi-header.templates": [
+					{
+						"language": "python",
+						"template": [
+							"",
+							"",
+							"File: <<filename>>",
+							"Author: <<author>>",
+							"<<company>>",
+							"Created: <<filecreated('yyyy-MM-DD hh:mm:ss')>>",
+							"----------------------------",
+							"Modified: <<dateformat('yyyy-MM-DD hh:mm:ss')>>",
+							"Modified By: <<author>>",
+							"========================================================================",
+							"HISTORY:"
+						],
+						"changeLogCaption": "HISTORY:",
+						"changeLogEntryTemplate": [
+							"",
+							"<<dateformat(YYYY-MM-DD)>>\t<<initials>>\t"
+						]
+					},
+					{
+						"language": "typescript",
+						"mapTo": "javascript"
+					}
+				],
+				/* ----------------- psi file header end ---------------- */
+				"smart-ime.enableEnglishAndDoubleSpaceSwitchToChinese": true,
+				"ime-and-cursor.cursorColor.enable": true,
+				"ime-and-cursor.cursorStyle.Chinese": "Line",
+				"workbench.colorCustomizations": {
+					"editorCursor.foreground": "#FF0000",
+					"terminalCursor.foreground": "#FF0000",
+					"editor.lineHighlightBackground": "#1073cf2d",
+					"editor.lineHighlightBorder": "#9fced11f"
+				},
+				"hediet.vscode-drawio.resizeImages": null,
+				"editor.inlayHints.enabled": "off",
+				"diffEditor.wordWrap": "off",
+				"editor.guides.indentation": false,
+				"editor.guides.bracketPairs": false,
+				"jupyter.notebookFileRoot": "${workspaceFolder}/src/RDCVC",
+				"debug.inlineValues": "on"
+			}
+		}
+	}
+}

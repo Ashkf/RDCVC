@@ -1,0 +1,53 @@
+<mxfile host="app.diagrams.net" modified="2023-06-25T05:45:24.260Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.58" etag="Tmm49AGQNNVPaHQ4JA8A" version="21.5.0" type="device">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="1217" dy="718" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="v934BUnf2ocfCGrIXOlq-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="v934BUnf2ocfCGrIXOlq-0" target="v934BUnf2ocfCGrIXOlq-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-0" value="Start" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="130" y="60" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="v934BUnf2ocfCGrIXOlq-7" target="v934BUnf2ocfCGrIXOlq-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-7" value="从 config.yml 读取默认参数" style="whiteSpace=wrap;html=1;rounded=1;arcSize=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="130" y="164" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-16" value="Y" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="v934BUnf2ocfCGrIXOlq-11" target="v934BUnf2ocfCGrIXOlq-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-18" value="N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="v934BUnf2ocfCGrIXOlq-11" target="v934BUnf2ocfCGrIXOlq-17">
+          <mxGeometry x="-0.9361" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="290" y="297" />
+              <mxPoint x="290" y="450" />
+              <mxPoint x="190" y="450" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-11" value="是否为 &lt;br&gt;resume&amp;nbsp;&lt;br&gt;模式" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="120" y="263" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="v934BUnf2ocfCGrIXOlq-13" target="v934BUnf2ocfCGrIXOlq-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-13" value="从 checkpoints 中读取参数" style="whiteSpace=wrap;html=1;rounded=1;arcSize=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="130" y="372" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="v934BUnf2ocfCGrIXOlq-17" target="v934BUnf2ocfCGrIXOlq-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-17" value="尝试从 args 中读取参数" style="whiteSpace=wrap;html=1;rounded=1;arcSize=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="130" y="476" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="v934BUnf2ocfCGrIXOlq-21" value="生成 optimizer" style="whiteSpace=wrap;html=1;rounded=1;arcSize=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="130" y="580" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

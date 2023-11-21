@@ -1,0 +1,8 @@
+{
+    "jupyter.notebookFileRoot": "${workspaceFolder}/src/RDCVC",
+    "debug.inlineValues": "on",
+    "conventionalCommits.scopes": [
+        "model.prediction.CVCNet"
+    ],
+    "todo-tree.tree.scanMode": "workspace only"
+}

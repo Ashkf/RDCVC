@@ -1,0 +1,40 @@
+{
+    // 欲了解更多信息，请访问：https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CVCNet-cuda_train",
+            "type": "python",
+            "cwd": "${workspaceFolder}",
+            "request": "launch",
+            "program": "train_cvcnet-cuda.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "cvcnet-mtl-mlp_6_36_3_36",
+                "cvcnet",
+                "--train_path=data/train/rdc_data_cleaned_train.csv",
+                "--eval_path=data/test/rdc_data_cleaned_eval.csv",
+                // "--device=cuda",
+                "--lr=1e-3",
+                "--batch_size=512",
+                "--epochs=5",
+                "--save_every=100",
+                "--normalize_target=x",
+                "--normalize_method=zscore",
+                "--earlystop",
+                "--espatience=100",
+                "--lr_scheduler",
+            ]
+        },
+        {
+            "name": "Python: 当前文件",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        }
+    ]
+}

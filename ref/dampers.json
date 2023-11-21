@@ -1,0 +1,122 @@
+{
+  "af9f2815-e37d-4b06-a77b-55901fdeb82e-00106b47": {
+    "id": "1095892728878727169",
+    "angle": 80.0,
+    "room": "二更",
+    "systemT": "supply",
+    "name": null,
+    "elementId": 1076039
+  },
+  "bfb4bf99-c787-4f91-a092-ea9cb331ca9d-00101025": {
+    "id": "1095892728878727173",
+    "angle": 42.0,
+    "room": "测试间三",
+    "systemT": "supply",
+    "name": null,
+    "elementId": 1052709
+  },
+  "63eef380-3780-4975-97fe-3b7b4dfcae0d-00105a58": {
+    "id": "1095892728878727170",
+    "angle": 42.0,
+    "room": "洁净走廊",
+    "systemT": "supply",
+    "name": null,
+    "elementId": 1071704
+  },
+  "63eef380-3780-4975-97fe-3b7b4dfcae0d-00105673": {
+    "id": "1095892728878727171",
+    "angle": 43.0,
+    "room": "洁净走廊",
+    "systemT": "supply",
+    "name": null,
+    "elementId": 1070707
+  },
+  "af9f2815-e37d-4b06-a77b-55901fdeb82e-00106cd3": {
+    "id": "1095892728878727172",
+    "angle": 51.0,
+    "room": "测试间一",
+    "systemT": "supply",
+    "name": null,
+    "elementId": 1076435
+  },
+  "972d1037-8612-4fa5-8544-48d3337b3c8a-000fff0c": {
+    "id": "1095892728878727175",
+    "angle": 69.0,
+    "room": "一更",
+    "systemT": "supply",
+    "name": null,
+    "elementId": 1048332
+  },
+  "bfb4bf99-c787-4f91-a092-ea9cb331ca9d-00100858": {
+    "id": "1095892728878727174",
+    "angle": 71.0,
+    "room": "测试间二",
+    "systemT": "supply",
+    "name": null,
+    "elementId": 1050712
+  },
+  "bfb4bf99-c787-4f91-a092-ea9cb331ca9d-001014ab": {
+    "id": "1095892728878727177",
+    "angle": 0.0,
+    "room": "二更",
+    "systemT": "return",
+    "name": null,
+    "elementId": 1053867
+  },
+  "bfb4bf99-c787-4f91-a092-ea9cb331ca9d-00101d82": {
+    "id": "1095892728878727178",
+    "angle": 0.0,
+    "room": "洁净走廊",
+    "systemT": "return",
+    "name": null,
+    "elementId": 1056130
+  },
+  "bfb4bf99-c787-4f91-a092-ea9cb331ca9d-0010193b": {
+    "id": "1095892728878727180",
+    "angle": 0.0,
+    "room": "测试间一",
+    "systemT": "return",
+    "name": null,
+    "elementId": 1055035
+  },
+  "bfb4bf99-c787-4f91-a092-ea9cb331ca9d-00102236": {
+    "id": "1095892728878727179",
+    "angle": 0.0,
+    "room": "测试间二",
+    "systemT": "return",
+    "name": null,
+    "elementId": 1057334
+  },
+  "e5237b90-3c9f-47f9-b257-543a9af62920-000f1799": {
+    "id": "1095892728874532864",
+    "angle": 0.0,
+    "room": "测试间三",
+    "systemT": "exhaust",
+    "name": null,
+    "elementId": 989081
+  },
+  "2d3a859b-8b63-4bbf-a037-b022f212d083-000df720": {
+    "id": "1095892728874532867",
+    "angle": 0.0,
+    "room": "测试间三",
+    "systemT": "exhaust",
+    "name": null,
+    "elementId": 915232
+  },
+  "d3435720-b963-4811-883f-ca6a8076932f-000f1d75": {
+    "id": "1095892728874532865",
+    "angle": 0.0,
+    "room": "测试间一",
+    "systemT": "exhaust",
+    "name": null,
+    "elementId": 990581
+  },
+  "e5237b90-3c9f-47f9-b257-543a9af62920-000f18d8": {
+    "id": "1095892728874532866",
+    "angle": 0.0,
+    "room": "测试间二",
+    "systemT": "exhaust",
+    "name": null,
+    "elementId": 989400
+  }
+}
