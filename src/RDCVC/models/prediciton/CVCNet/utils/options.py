@@ -113,7 +113,7 @@ def _set_train_args(parser):
         help="have the data reshuffled at every epoch",
     )
     parser.add_argument("--model_dir", type=str, help="!!! auto generated")
-    parser.add_argument("--num_tasks", type=int, help="!!! auto generated")
+    parser.add_argument("--num_tasks", type=int, default=1, help="!!! auto generated")
     parser.add_argument("--num_batches", type=int, help="!!! auto generated")
     parser.add_argument(
         "--resume_path", type=str, default="", help="resume training from a checkpoint"
@@ -155,6 +155,18 @@ def _set_train_args(parser):
         type=float,
         default=2,
         help="Temperature parameter for the DWA method, larger is smoother.",
+    )
+    parser.add_argument(
+        "--DWA_limit",
+        type=str,
+        default="none",
+        help="Limit the loss weight range, e.g. 0.1-10.",
+    )
+    parser.add_argument(
+        "--DWA_weight",
+        type=str,
+        default="none",
+        help="Specify the loss weight, e.g. 1,2,3,4,5,6,7,8,9,10.",
     )
     parser.add_argument(
         "--normalize_target",
@@ -337,16 +349,6 @@ def prepare_train_args():
     # ------------------- process and save ------------------- #
     _args.model_dir = _build_train_model_dir(_args)
 
-    # num_tasks
-    if "mtl" in _args.model_type.split("_")[0]:
-        # 获取 num_tasks
-        # _args.num_tasks = _args.model_type.split('_')[4]
-        # todo: 有待优化 num_tasks 的获取方法
-        if "cvcnet" in _args.model_type.split("_")[0]:
-            _args.num_tasks = 10
-    else:
-        _args.num_tasks = 1
-
     # device
     _args.device = _process_device(_args.device, _args.gpus)
 
@@ -382,6 +384,11 @@ def _check_args(_args):
         and _args.normalize_target != "none"
     ):
         raise ValueError("未设定归一化方法，但设定了归一化目标，请检查输入是否正确。")
+    if "mtl" in _args.model_type.split("_")[0]:
+        # 获取 num_tasks
+        # todo: 有待优化 num_tasks 的获取方法
+        if "cvcnet" in _args.model_type.split("_")[0]:
+            _args.num_tasks = 10
     if (
         _args.normalize_method != "no_normalize_method"
         and _args.normalize_target == "none"
@@ -391,12 +398,27 @@ def _check_args(_args):
         raise ValueError("resume_path 和 load_model_path 参数不能同时存在。")
     if _args.LWS != "none" and "mtl" not in _args.model_type.split("_")[0]:
         raise ValueError("LWS（loss_weight_strategy）只能在多目标学习场景下使用。")
-    if (
-        _args.model_dir is not None
-        or _args.num_tasks is not None
-        or _args.num_batches is not None
-    ):
-        raise ValueError("model_dir/num_tasks/num_batches 自动生成，不可手动指定。")
+    if _args.DWA_limit != "none":
+        if len(_args.DWA_limit.split("-")) != 2:
+            raise ValueError("DWA_limit 格式错误，应如：0.1-10。")
+        _lower, _upper = _args.DWA_limit.split("-")
+        if float(_lower) >= float(_upper):
+            raise ValueError("DWA_limit 格式错误，左值应小于右值。")
+        _args.DWA_limit = [float(_lower), float(_upper)]
+    else:
+        _args.DWA_limit = None
+    if _args.DWA_weight != "none":
+        # 解析为 list, float，要求为非零正值
+        _args.DWA_weight = [float(i) for i in _args.DWA_weight.split(",")]
+        if min(_args.DWA_weight) <= 0:
+            raise ValueError("DWA_weight 格式错误，应为非零正值。")
+        if len(_args.DWA_weight) != _args.num_tasks:
+            raise ValueError(
+                f"DWA_weight 格式错误，应为：{_args.num_tasks} 个逗号分隔的数字，"
+                "例如：1,2,3,4,5,6,7,8,9,10。"
+            )
+    if _args.model_dir is not None or _args.num_batches is not None:
+        raise ValueError("model_dir/num_batches 自动生成，不可手动指定。")
     if _args.espatience < 1:
         raise ValueError("early stop patience 必须 > 1。")
     if _args.esdelta < 0:

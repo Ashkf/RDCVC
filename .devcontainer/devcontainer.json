@@ -6,7 +6,8 @@
 	"image": "cnstark/pytorch:2.0.1-py3.10.11-cuda11.8.0-ubuntu22.04",
 	"runArgs": [
 		"--gpus=all",
-		"--shm-size=32g"
+		"--shm-size=32g",
+		"-p=6007:6007"
 	],
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
 	"workspaceFolder": "/workspace",

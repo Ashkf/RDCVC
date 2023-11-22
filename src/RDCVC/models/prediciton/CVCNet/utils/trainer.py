@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:03:55
 * ----------------------------
-* Modified: 2023-11-21 03:38:28
+* Modified: 2023-11-21 11:39:20
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -321,7 +321,7 @@ class Trainer:
     def prepare_default_config():
         """从 config.yml 中读取默认配置"""
         with open(
-            "/workspace/src/RDCVC/models/prediciton/CVCNet_cuda/configs/config.yml", "r"
+            "/workspace/src/RDCVC/models/prediciton/CVCNet/configs/config.yml", "r"
         ) as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
         return config

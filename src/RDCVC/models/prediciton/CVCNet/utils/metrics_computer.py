@@ -15,7 +15,8 @@ from typing import List, Tuple
 
 import numpy as np
 import torch
-from torch import Tensor, nn
+from torch import Tensor, mul
+from torch.nn import Softmax
 from torchmetrics.functional import (
     mean_squared_error,
     symmetric_mean_absolute_percentage_error,
@@ -46,11 +47,13 @@ def ctfd(data: dict[str, Tensor], keys: list[str] | None = None) -> Tensor:
     return _tensor
 
 
-def dynamic_weight_average(loss_t_1, loss_t_2, T=2):
+def dynamic_weight_average(
+    loss_t_1, loss_t_2, T=2, limit_L=None, limit_R=None, c=None
+) -> Tensor:
     r"""DWA (Dynamic Weighting Average)
 
     Warnings:
-        未对第一轮和第二轮的 loss 进行处理，
+        内部未对第一轮和第二轮的 loss 进行处理，
         默认 len(loss_t_1) == len(loss_t_2)
 
     动态平均权重，该情况下总体权重依然为：
@@ -78,18 +81,34 @@ def dynamic_weight_average(loss_t_1, loss_t_2, T=2):
         loss_t_1: 第 t-1 轮的 loss
         loss_t_2: 第 t-2 轮的 loss
         T: 温度参数
+        limit_low: lambda 下限 （optional）
+        limit_high: lambda 上限 （optional）
+        c: 额外添加的权重参数 （optional）
+    Note:
+        1. 该函数内部未对第一轮和第二轮的 loss 进行处理，默认 len(loss_t_1) == len(loss_t_2)
+        2. 若上下限不为 None，则会对 lambda 进行限制
+        3. 若 c 不为 None，则会对 lambda 进行额外的权重调整
+        4. 若不启用上下限和额外权重调整，则为经典的 DWA
     """
     assert len(loss_t_1) == len(
         loss_t_2
     ), "loss_t_1 and loss_t_2 must have the same length"
 
-    K = len(loss_t_1)  # K: 任务数
-    w = [
-        (l_1 / l_2) for l_1, l_2 in zip(loss_t_1, loss_t_2, strict=True)
-    ]  # w: loss 下降率
-    _lambda = K * nn.Softmax(dim=0)(torch.tensor(w) / T)
+    K = len(loss_t_1)  # K: number of tasks
 
-    _lambda = torch.clamp(_lambda, 0.1, 10)  # 限制权重范围
+    w = Tensor(
+        [(l_1 / l_2) for l_1, l_2 in zip(loss_t_1, loss_t_2, strict=True)]
+    )  # w: loss ratio, quicker task has smaller loss ratio
+
+    # c takes normalization
+    c = Tensor(([1] * K) if c is None else c)
+    c = c / torch.sum(c)
+
+    _lambda = K * Softmax(dim=0)(mul(w, c) / T)
+
+    if limit_L is not None and limit_R is not None:
+        _lambda = torch.clamp(_lambda, limit_L, limit_R)  # limit lambda
+
     return _lambda
 
 
@@ -184,10 +203,16 @@ class MetricsComputer:
             or self.loss_weight_strategy == "sum_loss"
         ):
             _weight = np.ones((1, self.num_tasks))
-        elif self.loss_weight_strategy == "DWA":
+        elif (
+            self.loss_weight_strategy == "DWA"
+            or self.loss_weight_strategy == "LDWA"
+            or self.loss_weight_strategy == "WDWA"
+            or self.loss_weight_strategy == "LWDWA"
+        ):
             _loss_buffer = self.logger.recoder.train_loss_buffer
             _loss_weight_buffer = self.logger.recoder.loss_weight_buffer
 
+            # ----------------- cal balancing weight ----------------- #
             if _loss_buffer is None:
                 _weight = np.ones((1, self.num_tasks))  # 第一轮权重为 1
             elif len(_loss_buffer) == 1:
@@ -196,7 +221,12 @@ class MetricsComputer:
                 _loss_t_1 = _loss_buffer[-1]  # 上轮的 loss
                 _loss_t_2 = _loss_buffer[-2]  # 上上轮的 loss
                 _weight = dynamic_weight_average(
-                    _loss_t_1, _loss_t_2, T=args.DWA_T
+                    _loss_t_1,
+                    _loss_t_2,
+                    T=args.DWA_T,
+                    limit_L=args.DWA_limit[0] if args.DWA_limit is not None else None,
+                    limit_R=args.DWA_limit[1] if args.DWA_limit is not None else None,
+                    c=args.DWA_weight,
                 )  # 计算权重
         else:
             raise NotImplementedError(
