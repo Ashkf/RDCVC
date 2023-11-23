@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:04:13
 * ----------------------------
-* Modified: 2023-11-21 02:51:03
+* Modified: 2023-11-23 12:32:39
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -36,10 +36,10 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         self.normalize_method = args.normalize_method  # 归一化的方法
         self.device = args.device[0]
         self.target_key = [
-            "TOT_SUPP_VOL",
             "TOT_FRSH_VOL",
-            "TOT_RET_VOL",
+            "TOT_SUPP_VOL",
             "TOT_EXH_VOL",
+            "TOT_RET_VOL",
             "RM1_PRES",
             "RM2_PRES",
             "RM3_PRES",
