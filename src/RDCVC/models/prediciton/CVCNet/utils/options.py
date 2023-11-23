@@ -88,7 +88,7 @@ def _set_common_args(parser):
         help="device: cuda or cpu. default: cuda",
     )
     parser.add_argument("--gpus", nargs="+", type=int, default=[0])
-    parser.add_argument("--seed", type=int, default=1234)
+    parser.add_argument("--seed", type=int, default=None)
     return parser
 
 

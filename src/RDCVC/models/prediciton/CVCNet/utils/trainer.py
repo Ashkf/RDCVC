@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:03:55
 * ----------------------------
-* Modified: 2023-11-21 11:39:20
+* Modified: 2023-11-23 01:38:51
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -15,6 +15,9 @@
 # built-in
 import os
 import pickle
+import random
+
+import numpy as np
 
 # third-party
 import torch
@@ -26,7 +29,6 @@ from tqdm import trange
 # self-built
 from ..datasets.data_entry import select_eval_loader, select_train_loader
 from ..models import model_entry
-from . import myutils
 from .early_stoper import EarlyStopper
 from .evaluator import Evaluator
 from .logger import Logger
@@ -39,22 +41,40 @@ from .torch_utils import load_match_dict
 
 
 class Trainer:
-    def __init__(self):
-        """构造函数
+    """
+    The Trainer class is responsible for training and evaluating a model.
 
-        1. 初始化命令行参数 arg、日志工具（Logger 对象）logger；
-        2. 初始化 train、val 的 dataloader；
-        3. 参数优化器 optimizer，以及模型本身 model。
+    Attributes:
+        args: The parsed training arguments.
+        default_config: The default configuration for the trainer.
+        logger: The logger for logging training progress.
+        scaler: The feature scaler for preprocessing data.
+        train_dataloader: The dataloader for training data.
+        val_dataloader: The dataloader for validation data.
+        model: The model to be trained.
+        metrics_computer: The metrics computer for evaluating model performance.
+        evaluator: The evaluator for evaluating model performance.
+        optimizer: The optimizer for updating model parameters.
+        lr_scheduler: The learning rate scheduler for adjusting learning rate during training.
+        model_executor: The model executor for executing model forward pass.
+        early_stopper: The early stopper for early stopping training based on validation loss.
+    """
+
+    def __init__(self):
         """
-        self.args = prepare_train_args()  # 解析训练 args，并保存
-        myutils.set_random_seed(self.args.seed)
+        Initializes the Trainer object.
+        """
+        self.args = prepare_train_args()
+        self.set_random_seed(self.args.seed)
         self.default_config = self.prepare_default_config()
         self.logger = Logger(self.args)  # 初始化 Logger
         self.scaler = Scaler(self.args)  # 初始化特征缩放器
-        self.train_loader = select_train_loader(
+        self.train_dataloader = select_train_loader(
             self.args, self.logger.logger, self.scaler
         )
-        self.val_loader = select_eval_loader(self.args, self.logger.logger, self.scaler)
+        self.val_dataloader = select_eval_loader(
+            self.args, self.logger.logger, self.scaler
+        )
         self.model = self.prepare_model()
         self.metrics_computer = self.prepare_metrics_computer()
         self.evaluator = self.prepare_evaluator()
@@ -142,7 +162,7 @@ class Trainer:
         self.metrics_computer.cal_loss_weight(self.args)  # 计算 loss_weight
         _device = self.args.device[0]
         """遍历整个 train_loader """
-        for index_batch, items_batch in enumerate(self.train_loader):
+        for index_batch, items_batch in enumerate(self.train_dataloader):
             _data, _target = items_batch
             self.optimizer.zero_grad()
             _pred = self.model(_data)
@@ -168,6 +188,23 @@ class Trainer:
                     f"Train: Epoch {index_epoch:04d} "
                     f"| batch {index_batch:04d}  | Loss {_loss}"
                 )
+
+    def set_random_seed(seed):
+        """设置随机种子
+
+        Args:
+            seed (int): 随机种子
+        """
+        if seed is None:
+            return
+        os.environ["PYTHONHASHSEED"] = str(seed)
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+            torch.cuda.manual_seed_all(seed)
+            torch.backends.cudnn.deterministic = True
 
     @staticmethod
     def gen_item(item, pred, label, is_train):
@@ -330,7 +367,7 @@ class Trainer:
         return Evaluator(
             self.model,
             self.args.model_type,
-            self.val_loader,
+            self.val_dataloader,
             self.logger,
             is_train=True,
             metrics_computer=self.metrics_computer,
