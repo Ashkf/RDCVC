@@ -6,7 +6,7 @@ import 自己的模型到 model_entry 的字典中
 import torch
 import torch.nn as nn
 
-from .CVCNet import CVCNet
+from .dense import CVCNet
 
 type2help = {
     "cvcnet": "CVCNet 模型。",
@@ -44,21 +44,35 @@ def init_model(model, args, logger):
     logger.info(f"初始化模型方法：{args.init_method}")
     init_methods = {
         "xavier": nn.init.xavier_normal_,
-        "kaiming": nn.init.kaiming_normal_,
+        "kaiming": _init_model_kaiming,
         "normal": nn.init.normal_,
         "uniform": nn.init.uniform_,
         "default": None,
     }
 
-    init_method = init_methods[
-        args.init_method
-    ]  # 获取 args.init_method 对应的初始化方法
-    if init_method is not None:
-        # 若指定了初始化方式，args.init_method 不为 None，则对模型参数进行指定方法的初始化
-        pass
-        return model
+    init_method = init_methods.get(args.init_method, None)
 
-    # 若 args.init_method 为 None，则使用 PyTorch 默认的初始化方法
+    # 若 args.init_method 为 None，则使用 kaiming 初始化方法
+    if init_method is None:
+        init_method = _init_model_kaiming
+
+    return init_method(model)
+
+
+def _init_model_kaiming(model):
+    """使用 kaiming 初始化方法初始化模型参数"""
+    for m in model.modules():
+        if isinstance(m, nn.Conv2d):
+            nn.init.kaiming_normal_(m.weight, mode="fan_in")
+            nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.BatchNorm2d):
+            # BN 层的参数初始化
+            nn.init.normal_(m.weight, 1, 0.02)
+            nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.Linear):
+            # 全连接层的参数初始化为 kaiming_normal
+            nn.init.kaiming_normal_(m.weight, mode="fan_in")
+            nn.init.constant_(m.bias, 0)
     return model
 
 
