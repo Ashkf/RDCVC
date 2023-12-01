@@ -4,5 +4,10 @@
     "conventionalCommits.scopes": [
         "model.prediction.CVCNet"
     ],
-    "todo-tree.tree.scanMode": "workspace only"
+    "todo-tree.tree.scanMode": "workspace",
+    "python.testing.pytestArgs": [
+        "src/tests/RDCVC"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
 }

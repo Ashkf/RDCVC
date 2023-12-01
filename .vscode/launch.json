@@ -15,6 +15,7 @@
                 "cvcnet",
                 "--train_path=data/train/rdc_data_cleaned_train.csv",
                 "--eval_path=data/test/rdc_data_cleaned_eval.csv",
+                "--seed=1234",
                 // "--device=cuda",
                 "--lr=2e-2",
                 "--lr_scheduler",

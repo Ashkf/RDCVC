@@ -31,8 +31,9 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-python.python",
+				"charliermarsh.ruff",
 				"ms-python.black-formatter",
+				"ms-python.python",
 				"svenzhao.var-translation",
 				"huacnlee.autocorrect",
 				"huibizhang.codesnap-plus",
@@ -41,7 +42,6 @@
 				"tamasfe.even-better-toml",
 				"sourcery.sourcery",
 				"njqdev.vscode-python-typehint",
-				"charliermarsh.ruff",
 				"alexcvzz.vscode-sqlite",
 				"psioniq.psi-header",
 				"christian-kohler.path-intellisense",
@@ -64,7 +64,9 @@
 				"donjayamanne.githistory",
 				"codezombiech.gitignore",
 				"VisualStudioExptTeam.vscodeintellicode",
-				"draivin.hscopes"
+				"draivin.hscopes",
+				"tomoki1207.pdf",
+				"Gerrnperl.outline-map"
 			],
 			"settings": {
 				"[python]": {
@@ -181,7 +183,7 @@
 				"black-formatter.showNotifications": "always",
 				"editor.stickyScroll.enabled": true,
 				"svg.preview.mode": "svg",
-				"workbench.tree.indent": 24,
+				"workbench.tree.indent": 8,
 				"python.analysis.diagnosticSeverityOverrides": {
 					"reportGeneralTypeIssues": "none",
 					"reportPropertyTypeMismatch": "none",
