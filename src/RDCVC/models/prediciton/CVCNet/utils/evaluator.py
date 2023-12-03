@@ -70,7 +70,7 @@ class Evaluator:
             for index_batch, item_batch in enumerate(self.dataloader):
                 _data, _target = item_batch
                 _pred = self.model(_data)
-                _metrics = self.metrics_computer.compute_metrics(
+                _metrics = self.metrics_computer.comp_metrics(
                     _pred, _target, is_train=False
                 )
                 # ======================= record =======================

@@ -6,15 +6,20 @@ import 自己的模型到 model_entry 的字典中
 import torch
 import torch.nn as nn
 
-from .dense import CVCNet
+from .cvcnet import CVCNet
+from .dense import Dense
+from .mmoe import ML_MMoE
 
 type2help = {
-    "cvcnet": "CVCNet 模型。",
+    "cvcnet": (
+        "CVCNet 模型。"
+        "cvcnet-mtl-mlp_<inputs_dim>"
+        "_<num_layers>_<num_tasks_experts>_<num_shared_experts>"
+        "_<expert_units, 32:32>_<tower_units, 32:32>"
+    ),
 }
 
-type2model = {
-    "cvcnet-mtl-mlp": CVCNet,
-}
+type2model = {"dense": Dense, "cvcnet-mtl-mlp": CVCNet, "mmoe-mtl-mlp": ML_MMoE}
 
 
 def select_model(model_type: str):
@@ -22,11 +27,15 @@ def select_model(model_type: str):
     _type = model_type.split("_")
 
     if _type[0] == "cvcnet-mtl-mlp":
+        # cvcnet-mtl-mlp_18_2_5_9_64:64:64_32:32:32
         return type2model[_type[0]](
-            backbone_depth=int(_type[1]),
-            backbone_dim=int(_type[2]),
-            head_depth=int(_type[3]),
-            head_dim=int(_type[4]),
+            inputs_dim=int(_type[1]),
+            target_dict={"Airflow": 4, "Pres": 6},
+            num_layers=int(_type[2]),
+            num_tasks_experts=int(_type[3]),
+            num_shared_experts=int(_type[4]),
+            expert_units=[int(v) for v in (_type[5]).split(":")],
+            tower_units=[int(v) for v in _type[6].split(":")],
         )
     else:
         raise ValueError(

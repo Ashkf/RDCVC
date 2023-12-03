@@ -6,11 +6,13 @@
 * Soochow University
 * Created: 2023-11-19 03:04:13
 * ----------------------------
-* Modified: 2023-11-23 12:32:39
+* Modified: 2023-12-03 09:51:44
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
 """
+
+from typing import Dict
 
 import pandas as pd
 import torch
@@ -74,7 +76,7 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         else:
             df = pd.read_csv(args.eval_path)
         _data = df[self.data_key + self.target_key].copy()
-        self.data: tuple = self.preproces_data(_data)
+        self.data: dict = self.preproces_data(_data)
 
     def __getitem__(self, index) -> tuple[Tensor, Tensor]:
         """Retrieves the data at the specified index.
@@ -85,13 +87,13 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         Returns:
             tuple[Tensor, Tensor]: A tuple of the input data and target variables.
         """
-        return self.data[0][index], self.data[1][index]
+        return self.data["data"][index], self.data["target"][index]
 
     def __len__(self) -> int:
         """返回数据集的大小"""
-        return len(self.data[0])
+        return len(self.data["data"])
 
-    def preproces_data(self, data: DataFrame) -> tuple[Tensor, Tensor]:
+    def preproces_data(self, data: DataFrame) -> Dict[str, Tensor]:
         """Preprocesses the input data and target variables.
 
         use sklearn's StandardScaler to normalize the data
@@ -102,7 +104,7 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
             data (DataFrame): The input data.
 
         Returns:
-            Tuple[Tensor, Tensor]: A tuple of the input data and target variables.
+            Dict[str, Tensor]: A tuple of the input data and target variables.
         """
         # ------------------------ unpack ------------------------ #
         _data: DataFrame = data[self.data_key].copy()
@@ -116,4 +118,4 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         _data = torch.tensor(_data.values, dtype=torch.float32).to(self.device)
         _target = torch.tensor(_target.values, dtype=torch.float32).to(self.device)
 
-        return _data, _target
+        return {"data": _data, "target": _target}

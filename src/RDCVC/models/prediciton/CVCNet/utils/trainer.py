@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:03:55
 * ----------------------------
-* Modified: 2023-11-23 01:38:51
+* Modified: 2023-12-03 12:48:04
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -159,17 +159,15 @@ class Trainer:
             index_epoch (int): 训练代数
         """
         self.model.train()  # switch to train mode
-        self.metrics_computer.cal_loss_weight(self.args)  # 计算 loss_weight
+        self.metrics_computer.calc_loss_weight(self.args)  # 计算 loss_weight
         _device = self.args.device[0]
         """遍历整个 train_loader """
         for index_batch, items_batch in enumerate(self.train_dataloader):
             _data, _target = items_batch
             self.optimizer.zero_grad()
             _pred = self.model(_data)
-            _metrics = self.metrics_computer.compute_metrics(
-                _pred, _target, is_train=True
-            )
-            _loss = self.metrics_computer.compute_loss()  # 计算 loss
+            _metrics = self.metrics_computer.comp_metrics(_pred, _target, is_train=True)
+            _loss = self.metrics_computer.comp_loss()  # 计算 loss
             _loss.backward()  # 反向传播
             self.optimizer.step()  # 使用预先设置的优化器根据当前梯度对权重进行更新
 
@@ -189,6 +187,7 @@ class Trainer:
                     f"| batch {index_batch:04d}  | Loss {_loss}"
                 )
 
+    @staticmethod
     def set_random_seed(seed):
         """设置随机种子
 
@@ -269,7 +268,7 @@ class Trainer:
 
         model = model_entry.equip_device(model, self.args.device)
 
-        print(model)
+        # print(model)
         # _in_dim = model.backbone.layers[0].in_features
         # summary(model, input_size=(1, _in_dim))  # 打印模型结构
         # model_graph = draw_graph(

@@ -143,29 +143,15 @@ class MetricsComputer:
         self.scaler = scaler
         self.num_tasks = num_tasks  # 任务数
 
-    def compute_metrics(
-        self, pred: dict[str, Tensor], target: dict[str, Tensor], is_train: bool
-    ) -> dict:
-        """计算模型的各项指标
-
-        Args:
-            pred(dict[str, Tensor]): 预测值
-            gt(dict[str, Tensor]): ground truth 真实值
-            is_train(bool): 是否是训练集
-
-        Returns:
-            metrics(dict): 计算好的指标
-        """
+    def comp_metrics(self, pred, target, is_train: bool) -> dict:
         if self.model_type.split("_")[0] == "cvcnet-mtl-mlp":
-            _metrics = self._compute_metrics_cvcnetmtlmlp(
-                pred, target, is_train=is_train
-            )
+            _metrics = self._comp_metrices_byTasksType(pred, target, is_train=is_train)
         else:
             raise ValueError("Unknown model type: {}".format(self.model_type))
         self.metrics = _metrics
         return _metrics
 
-    def compute_loss(self, metrics: dict | None = None) -> torch.Tensor:
+    def comp_loss(self, metrics: dict | None = None) -> torch.Tensor:
         """从 metrics 提取/计算损失
 
         Args:
@@ -197,7 +183,7 @@ class MetricsComputer:
             raise NotImplementedError(f"Unknown model type: {_model_type}")
         return loss
 
-    def cal_loss_weight(self, args):
+    def calc_loss_weight(self, args):
         if (
             self.loss_weight_strategy == "none"
             or self.loss_weight_strategy == "sum_loss"
@@ -261,8 +247,56 @@ class MetricsComputer:
     def _calc_loss_l1(self, pred, ground):
         return self._calc_mae(pred, ground)
 
-    def _compute_metrics_cvcnetmtlmlp(self, pred: Tuple[Tensor, ...], target, is_train):
-        """Compute metrics for CMNMTLMLP model."""
+    def _comp_metrices_byTasksType(self, pred: List[Tensor], target, is_train) -> dict:
+        """按照任务类别计算指标
+
+        RDCVC 任务中，分为两类任务，一类是系统风量，一类是区域压差
+
+        Args:
+            pred(List[Tensor]): 模型输出.
+                [Tensor(batch_size, D_t) * num_tasks], D_t 为任务 t 的输出维度
+            target(Tensor): 目标值。Tensor(batch_size, D) D 为所有任务的输出维度之和
+
+        UPDATE: 2023-12-03 20:00
+        """
+        # ------------------------- loss ------------------------- #
+        # per loss shape: (num_feature, )
+        assert (
+            pred[0].shape[1] == 4
+        ), "The task involving airflow has four specific targets."
+        _loss_airflow = self._calc_loss_l2(pred[0], target[:, :4])
+        assert (
+            pred[1].shape[1] == 6
+        ), "The task involving pressure has six specific targets."
+        _loss_rm_pres = self._calc_loss_l2(pred[1], target[:, 4:])
+
+        # ---------------------- 反归一化 (若对标签采取归一化) ----------------------
+        # !!! 会破坏 tensor 的计算图
+        # !!! scale 内部会进行 x.numpy() 操作，会破坏 tensor 的计算图
+        _pred = torch.cat(pred, dim=1)  # Tensor(batch_size, num_target)
+        _pred = self.scaler.scale(
+            _pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
+        ).to("cpu")
+        _target = self.scaler.scale(
+            target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
+        ).to("cpu")
+
+        # ------------------------ metrics ----------------------- #
+        prefix = "train/" if is_train else "val/"  # 前缀，用于区分训练和验证
+        metrics = {
+            prefix + "loss_airflow": torch.mean(_loss_airflow),
+            prefix + "loss_rm_pres": torch.mean(_loss_rm_pres),
+            prefix + "rmse_airflow": self._calc_rmse(_pred[:, :4], _target[:, :4]),
+            prefix + "mae_airflow": self._calc_mae(_pred[:, :4], _target[:, :4]),
+            prefix + "mape_rm_pres": self._calc_mape(_pred[:, 4:], _target[:, 4:]),
+            prefix + "rmse_rm_pres": self._calc_rmse(_pred[:, 4:], _target[:, 4:]),
+        }
+        return metrics
+
+    def _comp_metrics_byTarget(
+        self, pred: Tuple[Tensor] | List[Tensor], target, is_train
+    ):
+        """按照每个目标计算指标"""
 
         # pred: Tuple(Tensor(batch_size, 1) * num_tasks)
         # target: Tensor(batch_size, num_task)
@@ -309,6 +343,7 @@ class MetricsComputer:
 
     def _use_loss_weight(self, _loss: List[Tensor]) -> Tensor:
         """Use loss weight to compute loss."""
+        assert all(_l.shape == () for _l in _loss), "Per loss must be a scalar."
         _weight = self.logger.recoder.loss_weight_buffer[-1, :]
         for _l, _w in zip(_loss, _weight, strict=True):
             _l *= _w

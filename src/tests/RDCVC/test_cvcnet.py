@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-27 02:35:39
 * ----------------------------
-* Modified: 2023-12-01 02:21:19
+* Modified: 2023-12-01 04:16:48
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -78,12 +78,11 @@ def test_ExtractionNet(
     assert eNet
 
     if is_last_layer:
-        assert isinstance(outputs, dict)
+        assert isinstance(outputs, list)
         assert len(outputs) == len(target_dict)
-        for k, v in outputs.items():
-            assert isinstance(v, torch.Tensor)
-            assert k in target_dict.keys()
-            assert v.shape == (batch_size, target_dict[k])
+        for idx, out in enumerate(outputs):
+            assert isinstance(out, torch.Tensor)
+            assert out.shape == (batch_size, list(target_dict.values())[idx])
     else:
         assert isinstance(outputs, list)
         assert len(outputs) == 4  # SA + RA + EA + Shared
@@ -109,7 +108,7 @@ def test_CVCNet(
     dropout_rate,
 ):
     inputs_dim = 18
-    target_dict = {"PRESENCE": 6, "AIRFLOW": 4}
+    target_dict = {"AIRFLOW": 4, "PRESENCE": 6}
     cNet = CVCNet(
         inputs_dim=inputs_dim,
         target_dict=target_dict,
@@ -133,9 +132,8 @@ def test_CVCNet(
     outputs = cNet.forward(inputs)
 
     assert cNet
-    assert isinstance(outputs, dict)
+    assert isinstance(outputs, list)
     assert len(outputs) == len(target_dict)
-    for k, v in outputs.items():
-        assert isinstance(v, torch.Tensor)
-        assert k in target_dict.keys()
-        assert v.shape == (batch_size, target_dict[k])
+    for idx, out in enumerate(outputs):
+        assert isinstance(out, torch.Tensor)
+        assert out.shape == (batch_size, list(target_dict.values())[idx])

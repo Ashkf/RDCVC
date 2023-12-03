@@ -388,7 +388,7 @@ def _check_args(_args):
         # 获取 num_tasks
         # todo: 有待优化 num_tasks 的获取方法
         if "cvcnet" in _args.model_type.split("_")[0]:
-            _args.num_tasks = 10
+            _args.num_tasks = 2
     if (
         _args.normalize_method != "no_normalize_method"
         and _args.normalize_target == "none"

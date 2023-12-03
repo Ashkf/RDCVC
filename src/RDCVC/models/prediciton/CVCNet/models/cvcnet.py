@@ -6,13 +6,13 @@
 * Soochow University
 * Created: 2023-11-26 02:48:55
 * ----------------------------
-* Modified: 2023-12-01 02:51:40
+* Modified: 2023-12-03 07:43:59
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
 """
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import torch
 
@@ -224,7 +224,7 @@ class ExtractionNet(torch.nn.Module):
 
     def forward(
         self, inputs: Union[torch.Tensor, List[torch.Tensor]]
-    ) -> Union[Dict[str, torch.Tensor], List[torch.Tensor]]:
+    ) -> List[torch.Tensor]:
         """
         Returns:
             Union[Dict[str, torch.Tensor], List[torch.Tensor]]:
@@ -289,13 +289,11 @@ class ExtractionNet(torch.nn.Module):
                 ),
                 dim=1,
             )  # (batch_size, expert_units[-1]*num_gates)
-            out: Dict = {}
-            for task_name, tower, dense in zip(
-                list(self.target_dict.keys()), self.towers, self.task_dense, strict=True
-            ):
-                out[task_name] = dense(tower(tower_in))
+            task_outs = []
+            for tower, dense in zip(self.towers, self.task_dense, strict=True):
+                task_outs.append(dense(tower(tower_in)))
 
-            return out
+            return task_outs
 
         return [gate_shared_outputs, gate_SA_outputs, gate_RA_outputs, gate_EA_outputs]
 
@@ -319,19 +317,19 @@ class CVCNet(torch.nn.Module):
         num_tasks_experts: int,
         num_shared_experts: int,
         expert_units: List[int],
-        expert_activation: str,
-        expert_dropout_rate: Optional[float],
-        expert_use_bn: bool,
-        tower_units: Optional[List[int]],
-        tower_activation: Optional[str],
-        tower_dropout_rate: Optional[float],
-        tower_use_bn: Optional[bool],
+        expert_activation: str = "leakyrelu:0.1",
+        expert_dropout_rate: Optional[float] = None,
+        expert_use_bn: bool = False,
+        tower_units: List[int] = None,
+        tower_activation: Optional[str] = "leakyrelu:0.1",
+        tower_dropout_rate: Optional[float] = None,
+        tower_use_bn: Optional[bool] = None,
     ):
         """
         Args:
             inputs_dim (int): The dimension of the input features.
             target_dict (Dict[str, int]): The dictionary of target names and their dimensions.
-                e.g., {"PRESENCE": 6, "AIRFLOW": 4}
+                e.g., {"AIRFLOW": 4, "PRESENCE": 6}
             num_layers (int): The number of ExtractionNet layers.
             num_tasks_experts (int): The number of task experts.
             num_shared_experts (int): The number of shared experts.
@@ -366,8 +364,8 @@ class CVCNet(torch.nn.Module):
             ]
         )
 
-    def forward(self, inputs: torch.Tensor) -> Dict[str, torch.Tensor]:
+    def forward(self, inputs: torch.Tensor) -> Tuple[torch.Tensor]:
         for layer in self.extractionNet_layers:
             _outputs = layer(inputs)
             inputs = _outputs
-        return _outputs
+        return _outputs  # [task1_out, task2_out, ...]
