@@ -6,18 +6,17 @@
 * Soochow University
 * Created: 2023-10-07 02:26:02
 * ----------------------------
-* Modified: 2023-11-19 11:20:02
+* Modified: 2023-12-02 04:43:57
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
 """
 
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-def load_and_split_data(data_file, test_size=0.1, random_state=42):
+def load_and_split_data(data_file, test_size=0.1, random_state=42, is_split=True):
     """
     Loads the data from a CSV file, selects the relevant features,
     and splits the dataset into training and testing sets.
@@ -72,14 +71,18 @@ def load_and_split_data(data_file, test_size=0.1, random_state=42):
     ]
 
     _df_data = _df_raw[decision_features]
-    _df_label = _df_raw[controlled_features]
+    _df_target = _df_raw[controlled_features]
+    outs = _df_data.values, _df_target.values
 
-    x_train, x_test, y_train, y_test = train_test_split(
-        _df_data.values,
-        _df_label.values,
-        test_size=test_size,
-        shuffle=True,
-        random_state=random_state,
-    )
+    if is_split:
+        x_train, x_test, y_train, y_test = train_test_split(
+            _df_data.values,
+            _df_target.values,
+            test_size=test_size,
+            shuffle=True,
+            random_state=random_state,
+        )
 
-    return x_train, x_test, y_train, y_test
+        outs = x_train, x_test, y_train, y_test
+
+    return outs

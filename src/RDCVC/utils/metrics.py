@@ -1,12 +1,12 @@
 """
 * This file contains functions for calculating metrics and printing them for CCPmodel.
-* 
+*
 * File: metrics.py
 * Author: Fan Kai
 * Soochow University
 * Created: 2023-10-04 11:14:11
 * ----------------------------
-* Modified: 2023-10-08 04:47:09
+* Modified: 2023-12-02 04:56:05
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -87,7 +87,6 @@ def calculate_metrics(
             "Pres": np.sqrt(mse(_label_pres, _pred_pres)),
         },
     }
-
     print_ccp_metrics(metrics, title) if print_metrics else None
     return metrics if output else None
 
@@ -222,22 +221,32 @@ def get_ccp_scoring():
     def integrated_scoring(y_true, y_pred):
         mse_airflow = mse(y_true[:, :4], y_pred[:, :4])
         mse_pres = mse(y_true[:, 4:], y_pred[:, 4:])
-        return 0.01 * mse_airflow + 0.5 * mse_pres
+        return 0.05 * mse_airflow + 0.5 * mse_pres
 
     def airflow_rmse(y_true, y_pred):
         return mse(y_true[:, :4], y_pred[:, :4], squared=False)
 
+    def airflow_mae(y_true, y_pred):
+        return mae(y_true[:, :4], y_pred[:, :4])
+
     def pres_rmse(y_true, y_pred):
         return mse(y_true[:, 4:], y_pred[:, 4:], squared=False)
 
+    def pres_mae(y_true, y_pred):
+        return mae(y_true[:, 4:], y_pred[:, 4:])
+
     _integrated_scorer = make_scorer(integrated_scoring, greater_is_better=False)
-    _airflow_scorer = make_scorer(airflow_rmse, greater_is_better=False)
-    _pres_scorer = make_scorer(pres_rmse, greater_is_better=False)
+    _airflow_mae_scorer = make_scorer(airflow_mae, greater_is_better=False)
+    _airflow_rmse_scorer = make_scorer(airflow_rmse, greater_is_better=False)
+    _pres_mae_scorer = make_scorer(pres_mae, greater_is_better=False)
+    _pres_rmse_scorer = make_scorer(pres_rmse, greater_is_better=False)
 
     ccp_scoring = {
         "score": _integrated_scorer,
-        "airflow_rmse": _airflow_scorer,
-        "pres_rmse": _pres_scorer,
+        "airflow_mae": _airflow_mae_scorer,
+        "airflow_rmse": _airflow_rmse_scorer,
+        "pres_mae": _pres_mae_scorer,
+        "pres_rmse": _pres_rmse_scorer,
     }
 
     return ccp_scoring

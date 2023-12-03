@@ -32,6 +32,7 @@
 		"vscode": {
 			"extensions": [
 				"charliermarsh.ruff",
+				"donjayamanne.python-extension-pack",
 				"ms-python.black-formatter",
 				"ms-python.python",
 				"svenzhao.var-translation",
@@ -257,9 +258,6 @@
 					}
 				],
 				/* ----------------- psi file header end ---------------- */
-				"smart-ime.enableEnglishAndDoubleSpaceSwitchToChinese": true,
-				"ime-and-cursor.cursorColor.enable": true,
-				"ime-and-cursor.cursorStyle.Chinese": "Line",
 				"workbench.colorCustomizations": {
 					"editorCursor.foreground": "#FF0000",
 					"terminalCursor.foreground": "#FF0000",
@@ -269,10 +267,16 @@
 				"hediet.vscode-drawio.resizeImages": null,
 				"editor.inlayHints.enabled": "off",
 				"diffEditor.wordWrap": "off",
+				"diffEditor.hideUnchangedRegions.enabled": true,
 				"editor.guides.indentation": false,
 				"editor.guides.bracketPairs": false,
 				"jupyter.notebookFileRoot": "${workspaceFolder}/src/RDCVC",
-				"debug.inlineValues": "on"
+				"debug.inlineValues": "on",
+				"workbench.activityBar.location": "top",
+				"workbench.tree.renderIndentGuides": "always",
+				"notebook.undoRedoPerCell": false,
+				"notebook.output.textLineLimit": 14,
+				"notebook.scrolling.experimental.anchorToFocusedCell": "off"
 			}
 		}
 	}
