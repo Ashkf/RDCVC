@@ -87,7 +87,9 @@ class Scaler:
             )
 
         normalizer = self.normalizer[prefix]
-        data = normalizer.inverse_transform(data)  # !!! 会破坏 tensor 的计算图
+        data = normalizer.inverse_transform(
+            data.detach().to("cpu")
+        )  # !!! 会破坏 tensor 的计算图
         return data
 
     def normalize(
