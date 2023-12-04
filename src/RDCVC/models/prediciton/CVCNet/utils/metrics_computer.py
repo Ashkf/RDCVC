@@ -288,8 +288,8 @@ class MetricsComputer:
             prefix + "loss_rm_pres": torch.mean(_loss_rm_pres),
             prefix + "rmse_airflow": self._calc_rmse(_pred[:, :4], _target[:, :4]),
             prefix + "mae_airflow": self._calc_mae(_pred[:, :4], _target[:, :4]),
-            prefix + "mape_rm_pres": self._calc_mape(_pred[:, 4:], _target[:, 4:]),
             prefix + "rmse_rm_pres": self._calc_rmse(_pred[:, 4:], _target[:, 4:]),
+            prefix + "mae_rm_pres": self._calc_mae(_pred[:, 4:], _target[:, 4:]),
         }
         return metrics
 
