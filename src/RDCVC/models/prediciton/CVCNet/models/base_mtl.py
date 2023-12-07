@@ -7,7 +7,7 @@
 * Soochow University
 * Created: 2023-11-28 11:15:19
 * ----------------------------
-* Modified: 2023-12-05 12:34:32
+* Modified: 2023-12-05 12:53:54
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -62,9 +62,10 @@ class BaseMTL(torch.nn.Module):
             )
         self.task_dense = torch.nn.ModuleDict(
             {
-                f"{name}": torch.nn.Linear(
-                    tower_units[-1] if tower_units else bottom_units[-1],
-                    target_dict[name],  # dim of specific task's output
+                f"{name}": DNN(
+                    inputs_dim=tower_units[-1] if tower_units else bottom_units[-1],
+                    hidden_units=[target_dict[name]],
+                    activation=activation,
                 )
                 for name in target_dict
             }

@@ -9,6 +9,8 @@ import torch.nn as nn
 from .cvcnet import CVCNet
 from .dense import Dense
 from .mmoe import ML_MMoE
+from .split import SplitMTL
+from .submodules import DNN
 
 type2help = {
     "cvcnet": (
@@ -17,16 +19,26 @@ type2help = {
         "_<num_layers>_<num_tasks_experts>_<num_shared_experts>"
         "_<expert_units, 32:32>_<tower_units, 32:32>"
     ),
+    "split-mtl": (
+        "仅在输出层进行多任务划分的模型。Bottom 块为 DNN，输出层为 DNN。"
+        "split-mtl_<inputs_dim>_<bottom_units, 32:32>_"
+    ),
 }
 
-type2model = {"dense": Dense, "cvcnet-mtl-mlp": CVCNet, "mmoe-mtl-mlp": ML_MMoE}
+type2model = {
+    "dense": Dense,
+    "cvcnet-mtl-mlp": CVCNet,
+    "mmoe-mtl-mlp": ML_MMoE,
+    "dnn": DNN,
+    "split-mtl": SplitMTL,
+}
 
 
 def select_model(model_type: str):
     """入口，选择模型结构"""
     _type = model_type.split("_")
 
-    if _type[0] == "cvcnet-mtl-mlp":
+    if _type[0] == "cvcnet-mtl-mlp":  # 标准的 CVCNet 模型
         # cvcnet-mtl-mlp_18_2_5_9_64:64:64_32:32:32
         return type2model[_type[0]](
             inputs_dim=int(_type[1]),
@@ -36,6 +48,14 @@ def select_model(model_type: str):
             num_shared_experts=int(_type[4]),
             expert_units=[int(v) for v in (_type[5]).split(":")],
             tower_units=[int(v) for v in _type[6].split(":")],
+        )
+    elif _type[0] == "stl-mlp":
+        return
+    elif _type[0] == "split-mtl":
+        return type2model[_type[0]](
+            inputs_dim=int(_type[1]),
+            target_dict={"Airflow": 4, "Pres": 6},
+            bottom_units=[int(v) for v in _type[2].split(":")],
         )
     else:
         raise ValueError(

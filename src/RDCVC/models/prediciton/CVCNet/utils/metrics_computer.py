@@ -146,6 +146,8 @@ class MetricsComputer:
     def comp_metrics(self, pred, target, is_train: bool) -> dict:
         if self.model_type.split("_")[0] == "cvcnet-mtl-mlp":
             _metrics = self._comp_metrices_byTasksType(pred, target, is_train=is_train)
+        elif self.model_type.split("_")[0] == "split-mtl":
+            _metrics = self._comp_metrices_byTasksType(pred, target, is_train=is_train)
         else:
             raise ValueError("Unknown model type: {}".format(self.model_type))
         self.metrics = _metrics
@@ -171,7 +173,7 @@ class MetricsComputer:
                 ) from err
 
         # ---------------------------------- 计算损失 ----------------------------------
-        if _model_prefix == "cvcnet-mtl-mlp":
+        if _model_prefix == "cvcnet-mtl-mlp" or _model_prefix == "split-mtl":
             loss = [
                 v
                 for k, v in metrics.items()
