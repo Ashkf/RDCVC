@@ -3,7 +3,8 @@
     "debug.inlineValues": "on",
     "conventionalCommits.scopes": [
         "model.prediction.CVCNet",
-        "trainer"
+        "trainer",
+        "optimization"
     ],
     "todo-tree.tree.scanMode": "workspace",
     "python.testing.pytestArgs": [
