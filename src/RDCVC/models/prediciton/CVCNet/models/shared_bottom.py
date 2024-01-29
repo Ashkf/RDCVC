@@ -6,13 +6,12 @@
 * Soochow University
 * Created: 2023-11-28 11:15:19
 * ----------------------------
-* Modified: 2023-11-28 11:47:49
+* Modified: 2023-12-04 06:33:30
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
 """
 
-from collections import OrderedDict
 from typing import Dict, List
 
 import torch
@@ -60,11 +59,11 @@ class shared_bottom:
         assert len(self.target_dict) == len(self.towers)
 
     def forward(self, inputs):
-        outputs = OrderedDict()
+        outputs = []
         bottom_out = self.bottom(inputs)
         for id, name in enumerate(self.target_dict):
             tower_out = self.towers[id](bottom_out)
             task_out = self.task_dense[id](tower_out)
-            outputs[name] = task_out
+            outputs.append(task_out)
 
         return outputs
