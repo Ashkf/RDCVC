@@ -1,15 +1,30 @@
+"""
+*
+*
+* File: Args.py
+* Author: Fan Kai
+* Soochow University
+* Created: 2023-11-15 02:25:52
+* ----------------------------
+* Modified: 2024-01-07 10:58:45
+* Modified By: Fan Kai
+* ========================================================================
+* HISTORY:
+"""
+
+import os
+from argparse import ArgumentParser
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime
 from enum import Enum
-import os
 from typing import Optional, Union
+
 import toml
-from dataclasses import asdict, dataclass, replace
-from argparse import ArgumentParser
-from geatpy import moea_NSGA2_templet
+from geatpy import soea_SEGA_templet
 
-from CoreGA.problems.soea_nn_ALL_FreqPres_Pres import SN1
+from ..GA.problems.soea_nn_normal import SN1
 
-""" 
+"""
 本文件包含了：
     1. problem 和 algorithm 的选取入口
     2. 参数系统
@@ -23,12 +38,16 @@ from CoreGA.problems.soea_nn_ALL_FreqPres_Pres import SN1
 #         Optional mapping of problem and algorithm        #
 # -------------------------------------------------------- #
 problems_map = {
-    "soea_nn": SN1,
-    "soea_nn_ALL_FreqPres_Pres": SN1,
+    "soea-nn-normal": SN1,
 }
 
 algorithms_map = {
-    "nsga2": moea_NSGA2_templet,
+    "soea-sega": soea_SEGA_templet,
+    "moea-nsga2": ...,
+}
+
+postprocess_map = {
+    "soea-nn-normal_soea-sega": ...,
 }
 # -------------------------------------------------------- #
 
@@ -56,7 +75,7 @@ class Arguments:
             raise ValueError("nind must be greater than 0")
         if self.maxgen <= 0:
             raise ValueError("maxgen must be greater than 0")
-        if self.nnpath is not None:
+        if self.nnpath is None:
             print("[WARN] 未指定神经网络模型。")
 
     def __post_init__(self):
@@ -103,33 +122,50 @@ class GAArgsManager:
     ArgsManager 对象可以传入代码，方便随时调用。
     """
 
-    def __init__(self, mode: ArgsManagerMode, file_path: str = "./GAargs.toml"):
+    def __init__(self, mode: ArgsManagerMode, file_path: Optional[str] = None):
         """初始化 ArgsManager 对象
 
         Args:
             mode (ArgsManagerMode): 参数管理模式，用于决定参数来源优先级
+                若不指定为 FILE_FIRST，则不读取参数文件。
             file_path (str): 保存和读取参数的文件路径
         """
-        self.args: Optional[Arguments] = None
         self.mode = mode
-        self.file_path = file_path
+        if mode == ArgsManagerMode.FILE_FIRST:
+            assert file_path is not None, "FILE_FIRST, 未指定参数文件路径。"
+            self.file_path = file_path
 
-    def run(self):
+        self.args: Optional[Arguments] = None
+
+    def get_args(self) -> Optional[Arguments]:
         # ----------------------- 不同来源获取参数 ----------------------- #
         # args type: dict
-        _args_f = self._load_file(self.file_path)
+        if self.mode == ArgsManagerMode.FILE_FIRST:
+            _args_f = self._load_file(self.file_path)
         _args_c = self._parse_args()
 
         # ----------------------- 合并不同来源参数 ----------------------- #
         # args type: Arguments
-        if self.mode == ArgsManagerMode.CLI_FIRST or ArgsManagerMode.DEFAULT:
-            _args = self.merge_arguments(_args_c, _args_f)
-        elif self.mode == ArgsManagerMode.FILE_FIRST:
+        if self.mode == ArgsManagerMode.FILE_FIRST:
             _args = self.merge_arguments(_args_f, _args_c)
+        else:
+            _args = Arguments(**_args_c)
 
         # -------------------------- 后处理 ------------------------- #
-        _args = self._process(_args)  # 处理
-        self._store(_args, _args.save_dir)  # 保存
+        self.args = self._process(_args)  # 处理
+
+        return self.args
+
+    def save_args(self, file_dir: Optional[str] = None) -> None:
+        """保存参数为本地文件
+
+        Args:
+            file_dir (str): 存档目录
+        """
+        if file_dir is None:
+            self._store(self.args, self.args.save_dir)
+        else:
+            self._store(self.args, file_dir)
 
     @staticmethod
     def merge_arguments(
@@ -194,7 +230,7 @@ class GAArgsManager:
 
             return _args
 
-    def _process(self, args):
+    def _process(self, args: Arguments):
         """参数后处理"""
         args.save_dir = _generate_archive_directory(args)
         return args
@@ -216,6 +252,7 @@ class GAArgsManager:
     def _set_args(self, parser: ArgumentParser) -> ArgumentParser:
         """设置参数"""
         parser.add_argument(
+            "-p",
             "--problem",
             type=str,
             choices=problems_map.keys(),
@@ -223,6 +260,7 @@ class GAArgsManager:
             help="问题类型",
         )
         parser.add_argument(
+            "-a",
             "--algorithm",
             type=str,
             choices=algorithms_map.keys(),
@@ -246,7 +284,7 @@ class GAArgsManager:
         return parser
 
 
-def _generate_archive_directory(args):
+def _generate_archive_directory(args: Arguments):
     """生成 GA 运行存档目录
 
     Returns:
@@ -257,7 +295,7 @@ def _generate_archive_directory(args):
     # ------------------------- 存档文件名 ------------------------ #
     current_time = datetime.now()
     timestamp = current_time.strftime("%Y%m%dT%H%M%S")
-    dir_name = f"{args.problem}_{timestamp}"
+    dir_name = f"{args.problem}_{args.algorithm}_{timestamp}"
 
     # ------------------------ 构建存档目录 ------------------------ #
     archive_directory = os.path.join(_base_directory, dir_name).replace("\\", "/")
@@ -267,7 +305,7 @@ def _generate_archive_directory(args):
 
 
 if __name__ == "__main__":
-    # Example usage:
+    # Example usage 1:
     args = {
         "nind": 100,
         "maxgen": 100,
@@ -282,3 +320,9 @@ if __name__ == "__main__":
     arguments.update(args)
     print(arguments.nind)  # Output: 100
     print(arguments.save_dir)  # Output: path/to/save
+
+    # Example usage 2:
+    argMan = GAArgsManager(ArgsManagerMode.CLI_FIRST)
+    argMan.get_args()
+    argMan.save_args()
+    args = argMan.args

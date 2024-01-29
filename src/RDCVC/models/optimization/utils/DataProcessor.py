@@ -1,17 +1,29 @@
+"""
+* 用于处理数据的工具类
+*
+* File: DataProcessor.py
+* Author: Fan Kai
+* Soochow University
+* Created: 2023-11-15 22:25:52
+* ----------------------------
+* Modified: 2024-01-06 19:50:53
+* Modified By: Fan Kai
+* ========================================================================
+* HISTORY:
+"""
+
 import csv
 import datetime
 import sys
 
 import numpy as np
 import torch
-
-from sklearn.metrics import mean_squared_error as MSE
 from matplotlib import pyplot as plt
+from sklearn.metrics import mean_squared_error as MSE
 from utils.Ploter import Ploter  # 导入画图工具
 
 
 class DataProcessor:
-
     @staticmethod
     def parse_bim_result(bim_result: dict):
         """解析 BIM 模型的结果
@@ -32,35 +44,53 @@ class DataProcessor:
                 "AHU_FREQ": bim_result["fanConfigSnapShot"]["actualSupplyFrequency"],
                 "EF_FREQ": bim_result["fanConfigSnapShot"]["actualExhaustFrequency"],
                 # 送风阀角度
-                "RM1_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["一更"][0]["angle"],
-                "RM2_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["二更"][0]["angle"],
-                "RM3_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["测试间一"][0][
-                    "angle"],
-                "RM4_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["测试间二"][0][
-                    "angle"],
-                "RM5_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["测试间三"][0][
-                    "angle"],
-                "RM6_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["洁净走廊"][0][
-                    "angle"],
-                "RM6_SUPP_DMPR_1": bim_result["roomNameToSupplyDamperConfigs"]["洁净走廊"][1][
-                    "angle"],
+                "RM1_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["一更"][
+                    0
+                ]["angle"],
+                "RM2_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"]["二更"][
+                    0
+                ]["angle"],
+                "RM3_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"][
+                    "测试间一"
+                ][0]["angle"],
+                "RM4_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"][
+                    "测试间二"
+                ][0]["angle"],
+                "RM5_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"][
+                    "测试间三"
+                ][0]["angle"],
+                "RM6_SUPP_DMPR_0": bim_result["roomNameToSupplyDamperConfigs"][
+                    "洁净走廊"
+                ][0]["angle"],
+                "RM6_SUPP_DMPR_1": bim_result["roomNameToSupplyDamperConfigs"][
+                    "洁净走廊"
+                ][1]["angle"],
                 # 回风阀角度
-                "RM2_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"]["二更"][0]["angle"],
-                "RM3_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"]["测试间一"][0][
-                    "angle"],
-                "RM4_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"]["测试间二"][0][
-                    "angle"],
-                "RM6_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"]["洁净走廊"][0][
-                    "angle"],
+                "RM2_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"]["二更"][
+                    0
+                ]["angle"],
+                "RM3_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"][
+                    "测试间一"
+                ][0]["angle"],
+                "RM4_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"][
+                    "测试间二"
+                ][0]["angle"],
+                "RM6_RET_DMPR_0": bim_result["roomNameToReturnDamperConfigs"][
+                    "洁净走廊"
+                ][0]["angle"],
                 # 排风阀角度
-                "RM3_EXH_DMPR_0": bim_result["roomNameToExhaustDamperConfigs"]["测试间一"][0][
-                    "angle"],
-                "RM4_EXH_DMPR_0": bim_result["roomNameToExhaustDamperConfigs"]["测试间二"][0][
-                    "angle"],
-                "RM5_EXH_DMPR_0": bim_result["roomNameToExhaustDamperConfigs"]["测试间三"][0][
-                    "angle"],
-                "RM5_EXH_DMPR_1": bim_result["roomNameToExhaustDamperConfigs"]["测试间三"][1][
-                    "angle"],
+                "RM3_EXH_DMPR_0": bim_result["roomNameToExhaustDamperConfigs"][
+                    "测试间一"
+                ][0]["angle"],
+                "RM4_EXH_DMPR_0": bim_result["roomNameToExhaustDamperConfigs"][
+                    "测试间二"
+                ][0]["angle"],
+                "RM5_EXH_DMPR_0": bim_result["roomNameToExhaustDamperConfigs"][
+                    "测试间三"
+                ][0]["angle"],
+                "RM5_EXH_DMPR_1": bim_result["roomNameToExhaustDamperConfigs"][
+                    "测试间三"
+                ][1]["angle"],
                 # 房间 1（一更）状态
                 "RM1_DIFF_VOL": bim_result["roomNameToRemainWindVolume"]["一更"],
                 "RM1_EXH_VOL": bim_result["roomNameToExhaustWindVolume"]["一更"],
@@ -107,12 +137,15 @@ class DataProcessor:
                 "TOT_EXH_VOL": bim_result["exhaustQe"],
                 "TOT_FRSH_VOL": bim_result["newWindVolumeQf"],
                 "TOT_RET_VOL": bim_result["totalNewWindVolumeQr"],
-                "TOT_SUPP_VOL": bim_result["totalWindVolumeQs"]
+                "TOT_SUPP_VOL": bim_result["totalWindVolumeQs"],
             }
             return result_dict
         except TypeError as e:
-            print(f"parse_bim_result 时出错。错误信息：{e}。时间：{datetime.datetime.now()}。")
-            print(f"主动退出程序。")
+            print(
+                f"parse_bim_result 时出错。错误信息：{e}。"
+                f"时间：{datetime.datetime.now()}。"
+            )
+            print("主动退出程序。")
             sys.exit(1)
 
     @staticmethod
@@ -156,13 +189,13 @@ class DataProcessor:
         Returns:
             arr (np.ndarray): 一个 ndarry
         """
-        # 检查 keys 是否相同
-        keys = [set(d.keys()) for d in dicts]
-        if not all([k == keys[0] for k in keys]):
+        # --------------------- 检查 keys 是否相同 --------------------- #
+        keys_set = set(dicts[0].keys())
+        if not all(set(d.keys()) == keys_set for d in dicts[1:]):
             raise ValueError("dicts 的 keys 必须相同")
-        # 按照指定顺序对键进行排序
+
+        # -------------------------- 排序 -------------------------- #
         sorted_keys = sorted(order, key=lambda x: order.index(x))
-        # 将对应的值存储到数组中
         arr = np.array([[d[k] for d in dicts] for k in sorted_keys])
         return arr
 
@@ -198,32 +231,33 @@ class DataProcessor:
                     "room": room_name,
                     "systemT": systemT,
                     "name": None,
-                    "elementId": damper_config["elementId"]
+                    "elementId": damper_config["elementId"],
                 }
 
         return dampers
 
     @staticmethod
     def Vars2Dict(Vars):
-        X = {"MAU_FREQ": Vars[0] / 10,
-             "AHU_FREQ": Vars[1] / 10,
-             "EF_FREQ": Vars[2] / 10,
-             "RM1_SUPP_DMPR_0": Vars[3],
-             "RM2_SUPP_DMPR_0": Vars[4],
-             "RM3_SUPP_DMPR_0": Vars[5],
-             "RM4_SUPP_DMPR_0": Vars[6],
-             "RM5_SUPP_DMPR_0": Vars[7],
-             "RM6_SUPP_DMPR_0": Vars[8],
-             "RM6_SUPP_DMPR_1": Vars[9],
-             "RM2_RET_DMPR_0": Vars[10],
-             "RM3_RET_DMPR_0": Vars[11],
-             "RM4_RET_DMPR_0": Vars[12],
-             "RM6_RET_DMPR_0": Vars[13],
-             "RM3_EXH_DMPR_0": Vars[14],
-             "RM4_EXH_DMPR_0": Vars[15],
-             "RM5_EXH_DMPR_0": Vars[16],
-             "RM5_EXH_DMPR_1": Vars[17]
-             }
+        X = {
+            "MAU_FREQ": Vars[0] / 10,
+            "AHU_FREQ": Vars[1] / 10,
+            "EF_FREQ": Vars[2] / 10,
+            "RM1_SUPP_DMPR_0": Vars[3],
+            "RM2_SUPP_DMPR_0": Vars[4],
+            "RM3_SUPP_DMPR_0": Vars[5],
+            "RM4_SUPP_DMPR_0": Vars[6],
+            "RM5_SUPP_DMPR_0": Vars[7],
+            "RM6_SUPP_DMPR_0": Vars[8],
+            "RM6_SUPP_DMPR_1": Vars[9],
+            "RM2_RET_DMPR_0": Vars[10],
+            "RM3_RET_DMPR_0": Vars[11],
+            "RM4_RET_DMPR_0": Vars[12],
+            "RM6_RET_DMPR_0": Vars[13],
+            "RM3_EXH_DMPR_0": Vars[14],
+            "RM4_EXH_DMPR_0": Vars[15],
+            "RM5_EXH_DMPR_0": Vars[16],
+            "RM5_EXH_DMPR_1": Vars[17],
+        }
         return X
 
     @staticmethod
@@ -260,12 +294,12 @@ class DataProcessor:
         best_ObjVs = result["optPop"].ObjV
         # 将优化结果保存到文件
         # optPop.Phen 和 optPop.ObjV 中元素，依据行索引对应，保存到同一个 csv 文件中
-        with open(algorithm.dirName + '/' + 'optPop.csv', 'w') as f:
+        with open(algorithm.dirName + "/" + "optPop.csv", "w") as f:
             writer = csv.writer(f)
-            writer.writerow(['id', 'Phen', 'ObjV'])
+            writer.writerow(["id", "Phen", "ObjV"])
             for i in range(best_Vars.shape[0]):
                 writer.writerow([i, best_Vars[i], best_ObjVs[i]])
-            print(f'optPop.csv saved to {algorithm.dirName}')
+            print(f"optPop.csv saved to {algorithm.dirName}")
 
         # 从 optPop 中获取最优解
         # 1. 依据 ObjV 的第二列和第三列，筛选出符合条件的行，保存到 criterion
@@ -298,25 +332,25 @@ class DataProcessor:
 
         # 输出最佳个体的决策变量和目标函数值，并保存为 criterion_best_chrom.txt
         best_Phen = best_Vars[best_index]
-        with open(algorithm.dirName + '/' + 'criterion_best_chrom.txt', 'w') as f:
-            print(f'best index: {best_index}')
-            f.write('best index: ' + str(best_index) + '\n')
+        with open(algorithm.dirName + "/" + "criterion_best_chrom.txt", "w") as f:
+            print(f"best index: {best_index}")
+            f.write("best index: " + str(best_index) + "\n")
 
-            print(f'criterion: {criterion[best_index]}')
-            f.write('criterion: ' + str(criterion[best_index]) + '\n')
+            print(f"criterion: {criterion[best_index]}")
+            f.write("criterion: " + str(criterion[best_index]) + "\n")
 
-            print(f'best Phen: {best_Vars[best_index]}')
-            f.write('best Phen: ' + str(best_Vars[best_index]) + '\n')
+            print(f"best Phen: {best_Vars[best_index]}")
+            f.write("best Phen: " + str(best_Vars[best_index]) + "\n")
 
-            print(f'best ObjV: {best_ObjVs[best_index]}')
-            f.write('best ObjV: ' + str(best_ObjVs[best_index]) + '\n')
+            print(f"best ObjV: {best_ObjVs[best_index]}")
+            f.write("best ObjV: " + str(best_ObjVs[best_index]) + "\n")
 
         # =====
         # 最优解
         # =====
         X_opt = DataProcessor.Vars2Dict(best_Phen.reshape(-1))  # 优化后的决策变量字典
         opt_result = problem.get_result(X_opt)  # 优化后的结果
-        with open(algorithm.dirName + '/' + 'opt_result.txt', 'w') as f:
+        with open(algorithm.dirName + "/" + "opt_result.txt", "w") as f:
             f.write(str(opt_result))
 
     @staticmethod
@@ -337,40 +371,62 @@ class DataProcessor:
         # 进化过程的种群信息 (trace)
         # =======================
         # algorithm.trace 的结构：{'f_best': [], 'f_avg': []}
-        Ploter.plot_trace(algorithm.trace, save_path=algorithm.dirName + '/' + 'trace.png')
+        Ploter.plot_trace(
+            algorithm.trace, save_path=algorithm.dirName + "/" + "trace.png"
+        )
         # 保存 trace 原始数据
-        with open(algorithm.dirName + '/' + 'trace.txt', 'w') as file:
+        with open(algorithm.dirName + "/" + "trace.txt", "w") as file:
             file.write(str(algorithm.trace))
         # =====
         # 最优解
         # =====
-        X_opt = DataProcessor.Vars2Dict(result['Vars'].reshape(-1))  # 优化后的决策变量字典
+        X_opt = DataProcessor.Vars2Dict(
+            result["Vars"].reshape(-1)
+        )  # 优化后的决策变量字典
         opt_result = problem.get_result(X_opt)  # 优化后的结果
         opt_pressure = np.zeros((7, 1))
         if from_api:
             #  从 result 中取出取出房间压差
-            room_pres_keys = ["RM1_PRES", "RM2_PRES", "RM3_PRES", "RM4_PRES", "RM5_PRES",
-                              "RM6_PRES", "RM7_PRES"]
-            opt_pressure = np.array([opt_result.get(key) for key in room_pres_keys]).reshape(-1, 1)
+            room_pres_keys = [
+                "RM1_PRES",
+                "RM2_PRES",
+                "RM3_PRES",
+                "RM4_PRES",
+                "RM5_PRES",
+                "RM6_PRES",
+                "RM7_PRES",
+            ]
+            opt_pressure = np.array(
+                [opt_result.get(key) for key in room_pres_keys]
+            ).reshape(-1, 1)
         opt_pres_rmse = np.sqrt(MSE(opt_pressure, problem.calReferObjV()))
-        opt_freq = [X_opt['MAU_FREQ'], X_opt['AHU_FREQ'], X_opt['EF_FREQ']]  # 优化后的风机频率
+        opt_freq = [
+            X_opt["MAU_FREQ"],
+            X_opt["AHU_FREQ"],
+            X_opt["EF_FREQ"],
+        ]  # 优化后的风机频率
 
         # 压差状态图
-        res_data = {'ref_press': problem.calReferObjV(), 'opt_press': opt_pressure}  # 绘图数据
-        Ploter.plot_pres_per_rooms(res_data, save_path=algorithm.dirName + '/' + 'result.png')
+        res_data = {
+            "ref_press": problem.calReferObjV(),
+            "opt_press": opt_pressure,
+        }  # 绘图数据
+        Ploter.plot_pres_per_rooms(
+            res_data, save_path=algorithm.dirName + "/" + "result.png"
+        )
         plt.show()
 
         # ================== 输出状态 ==================
         print(f'求解状态：{result["success"]}')
         print(f'评价次数：{result["nfev"]}')
         print(f'时间花费：{result["executeTime"]}秒')
-        if result['success']:
+        if result["success"]:
             print(f'最优的目标函数值为：{result["ObjV"]}')
             print(f'最优的决策变量值为：{result["Vars"]}')
-            print(f'最优的风机频率为：{opt_freq}')
-            print(f'最优的压差为：{opt_pres_rmse}')
+            print(f"最优的风机频率为：{opt_freq}")
+            print(f"最优的压差为：{opt_pres_rmse}")
         else:
-            print('此次未找到可行解。')
+            print("此次未找到可行解。")
 
     @staticmethod
     def process_result_moea(result, algorithm, problem):

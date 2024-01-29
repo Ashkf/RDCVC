@@ -1,6 +1,19 @@
-# -*- coding: utf-8 -*-
-import numpy as np
+"""
+*
+*
+* File: rdc_moea_FreqRPres_0.py
+* Author: Fan Kai
+* Soochow University
+* Created: 2023-11-15 02:25:50
+* ----------------------------
+* Modified: 2024-01-07 12:00:58
+* Modified By: Fan Kai
+* =======================================================LC_TIME=en_DK.UTF-8=================
+* HISTORY:
+"""
+
 import geatpy as ea
+import numpy as np
 
 """
     该 problem 为 RDC 压差控制默认方案
@@ -91,6 +104,7 @@ class RdcMoeaFRp0(ea.Problem):
         return np.hstack((_dcsn_var, _ctrl_var))
 
 
+# 以下为决策变量和受控变量的顺序
 decision_vars = [
     "MAU_FREQ",
     "AHU_FREQ",
@@ -112,10 +126,10 @@ decision_vars = [
     "RM5_EXH_DMPR_1",
 ]
 ctrled_vars = [
-    "TOT_SUPP_VOL",
     "TOT_FRSH_VOL",
-    "TOT_RET_VOL",
+    "TOT_SUPP_VOL",
     "TOT_EXH_VOL",
+    "TOT_RET_VOL",
     "RM1_PRES",
     "RM2_PRES",
     "RM3_PRES",
