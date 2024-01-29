@@ -14,7 +14,7 @@
 	"onCreateCommand": "pip install -r requirements.txt",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2.3.0": {
+		"ghcr.io/devcontainers/features/common-utils:2.3.1": {
 			"username": "automatic",
 			"uid": "automatic",
 			"gid": "automatic"
@@ -67,7 +67,8 @@
 				"VisualStudioExptTeam.vscodeintellicode",
 				"draivin.hscopes",
 				"tomoki1207.pdf",
-				"Gerrnperl.outline-map"
+				"Gerrnperl.outline-map",
+				"albymor.increment-selection"
 			],
 			"settings": {
 				"[python]": {
@@ -210,7 +211,7 @@
 					"isActive": true,
 					"modAuthor": "Modified By:",
 					"modDate": "Modified:",
-					"modDateFormat": "dd/MM/yyyy hh:nn:ss",
+					"modDateFormat": "dd/MM/yyyy HH:mm:ss",
 					"autoHeader": "autoSave",
 					"include": [
 						"python"
@@ -239,9 +240,9 @@
 							"File: <<filename>>",
 							"Author: <<author>>",
 							"<<company>>",
-							"Created: <<filecreated('yyyy-MM-DD hh:mm:ss')>>",
+							"Created: <<filecreated('yyyy-MM-DD HH:mm:ss')>>",
 							"----------------------------",
-							"Modified: <<dateformat('yyyy-MM-DD hh:mm:ss')>>",
+							"Modified: <<dateformat('yyyy-MM-DD HH:mm:ss')>>",
 							"Modified By: <<author>>",
 							"========================================================================",
 							"HISTORY:"
@@ -249,7 +250,7 @@
 						"changeLogCaption": "HISTORY:",
 						"changeLogEntryTemplate": [
 							"",
-							"<<dateformat(YYYY-MM-DD)>>\t<<initials>>\t"
+							"<<dateformat(yyyy-MM-DD HH:mm:ss)>>\t<<initials>>\t"
 						]
 					},
 					{

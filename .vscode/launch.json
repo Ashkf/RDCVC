@@ -3,6 +3,22 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "GA_Optimization",
+            "type": "python",
+            "request": "launch",
+            "program": "src/RDCVC/scripts/optimize_GA.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-p=soea-nn-normal",
+                "-a=soea-sega",
+                "-n=100",
+                "-g=100",
+                "-t=10000",
+                "--nnpath=/workspace/checkpoints/NN/split-mtl_18_10000:10000:10000:10000:10000:10000_BS128_LR0.0002_EP1000_2023-12-06T12-47-19/final_model.pth",
+            ]
+        },
+        {
             "name": "Split-cuda_train",
             "type": "python",
             "cwd": "${workspaceFolder}",
@@ -41,16 +57,16 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "cvcnet-mtl-mlp_18_3_16_32_512:512:512_256:256:256_1:10",
+                "cvcnet-mtl-mlp_18_2_5_9_64:64:64_32:32:32_1:5",
                 "cvcnet",
                 "--train_path=data/train/rdc_data_cleaned_train.csv",
                 "--eval_path=data/test/rdc_data_cleaned_eval.csv",
                 "--seed=42",
                 // "--device=cpu",
-                "--lr=2e-4",
+                "--lr=2e-2",
                 "--lr_scheduler",
                 "--lrsmin=1e-5",
-                "--batch_size=128",
+                "--batch_size=64",
                 "--epochs=1000",
                 "--save_every=100",
                 "--normalize_target=xy",
@@ -59,7 +75,7 @@
                 "--espatience=100",
                 "--LWS=DWA",
                 "--DWA_limit=0.1-10",
-                "--DWA_weight=1,10",
+                "--DWA_weight=1,5",
             ]
         },
         {

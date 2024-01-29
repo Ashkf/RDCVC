@@ -1,0 +1,46 @@
+# devcontainer 说明
+
++ pytorch_docker 生成纯洁的 pytorch+cuda+python 的 docker 镜像
++ vscode devcontainer 生成最终的 vscode 开发环境
+
+## pytorch_docker
+
+[Github](https://github.com/cnstark/pytorch-docker)
+
+### Generate Build Script
+
+Generate build script by following command (available versions see [Available Versions](#Available-Versions)):
+
+```shell
+python generate_build_script.py --os <ubuntu or centos> --os-version <e.g. 20.04, 8> --python <e.g. 3.9.12> --pytorch <e.g. 1.9.1> --cuda <e.g. 11.1, cpu>
+```
+
+```shell
+usage: generate_build_script.py [-h] --os OS --os-version OS_VERSION --python PYTHON --pytorch PYTORCH [--cuda CUDA] [--cuda-flavor CUDA_FLAVOR]
+
+Generate docker build script.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --os OS               Operating system.
+  --os-version OS_VERSION
+                        Operating system version.
+  --python PYTHON       Python version.
+  --pytorch PYTORCH     Pytorch version.
+  --cuda CUDA           CUDA version, `cpu` means CPU version.
+  --cuda-flavor CUDA_FLAVOR
+                        CUDA flavor, `runtime` or `devel`, default is None, means use base image
+```
+
+### Build Pytorch Docker Image
+
+```
+scripts/build_xxx.sh
+```
+## vscode devcontainer
+
+include:
++ vscode extension
++ vscode settings
++ vscode devcontainer settings
++ requirements.txt
