@@ -1,21 +1,27 @@
 """
-这里定义了各种实验参数，其他模块多多少少都会与此有关，受此控制；
-
-这里用命令行参数把各种参数通过某种方式传给程序。
-
-命令行传参用到了 argparse 这个 lib
-
-使用方法：
-    1. 先用 parse_common_args 添加训练测试共用的一些参数
-    2. 在 parse_train_args 和 parse_test_args 中调用这个公共的函数，
-        这样可以避免有些参数在训练时写了，测试时忘了写，一跑就报错。
-    3. parse_train_args 解析训练相关的参数，
-    4. parse_test_args 解析测试相关的参数；
-
-使用时，调用 prepare_train_args，就会创建一个包含所有公共参数和训练参数的 parser，
-然后创建一个模型目录，并调用 save_args 函数保存所有参数，返回对应的 args。
-保存参数这一步十分重要，能够避免模型训练完成之后忘记自己训练的模型配置这种尴尬局面。
-测试时也类似，调用 prepare_test_args。
+* 这里用 argparse 通过命令行参数把各种参数通过某种方式传给程序。
+*
+* 使用方法：
+*     1. 先用 parse_common_args 添加训练测试共用的一些参数
+*     2. 在 parse_train_args 和 parse_test_args 中调用这个公共的函数，
+*         这样可以避免有些参数在训练时写了，测试时忘了写，一跑就报错。
+*     3. parse_train_args 解析训练相关的参数，
+*     4. parse_test_args 解析测试相关的参数；
+*
+* 使用时，调用 prepare_train_args，就会创建一个包含所有公共参数和训练参数的 parser，
+* 然后创建一个模型目录，并调用 save_args 函数保存所有参数，返回对应的 args。
+* 保存参数这一步十分重要，能够避免模型训练完成之后忘记自己训练的模型配置这种尴尬局面。
+* 测试时也类似，调用 prepare_test_args。
+*
+* File: options.py
+* Author: Fan Kai
+* Soochow University
+* Created: 2024-02-06 18:22:34
+* ----------------------------
+* Modified: 2024-02-09 01:22:40
+* Modified By: Fan Kai
+* ========================================================================
+* HISTORY:
 """
 
 import argparse
@@ -25,7 +31,7 @@ import re
 import yaml
 
 from ..datasets.data_entry import type2data
-from ..models.model_entry import type2help, type2model
+from ..models.model_entry import type2model
 from .myutils import get_now_time
 
 
@@ -54,15 +60,9 @@ def _set_common_args(parser):
         "model_type",
         type=str,
         metavar="model_type",
-        help=(
-            f"【模型类型】可选：{list(type2model.keys())}\n"
-            "================== model_type help ===================\n"
-            f"{[f'{k}: {v}' for k, v in type2help.items()]}"
-        ),
+        help=(f"{list(type2model.keys())}"),
     )
-    parser.add_argument(
-        "data_type", type=str, help=f"[dataset type]：{list(type2data.keys())}"
-    )
+    parser.add_argument("data_type", type=str, help=f"{list(type2data.keys())}")
     parser.add_argument(
         "--save_prefix", type=str, default=".", help="Preserve the prefix of the model."
     )

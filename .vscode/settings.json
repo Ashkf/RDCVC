@@ -2,7 +2,7 @@
     "jupyter.notebookFileRoot": "${workspaceFolder}/src/RDCVC",
     "debug.inlineValues": "on",
     "conventionalCommits.scopes": [
-        "model.prediction.CVCNet",
+        "CVCNet",
         "trainer",
         "optimization"
     ],

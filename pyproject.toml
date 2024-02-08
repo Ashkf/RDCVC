@@ -48,6 +48,7 @@ ruff = "^0.2.0"
 black = "^24.1.1"
 mypy = "^1.8.0"
 pandas-stubs = "^2.1.4.231227"
+types-pyyaml = "^6.0.12.12"
 
 [[tool.poetry.source]]
 name = "torch"

@@ -7,30 +7,31 @@ import torch
 import torch.nn as nn
 
 from .cvcnet import CVCNet
-from .dense import Dense
-from .mmoe import ML_MMoE
-from .split import SplitMTL
-from .submodules import DNN
 
-type2help = {
-    "cvcnet": (
-        "CVCNet 模型。"
-        "cvcnet-mtl-mlp_<inputs_dim>"
-        "_<num_layers>_<num_tasks_experts>_<num_shared_experts>"
-        "_<expert_units, 32:32>_<tower_units, 32:32>"
-    ),
-    "split-mtl": (
-        "仅在输出层进行多任务划分的模型。Bottom 块为 DNN，输出层为 DNN。"
-        "split-mtl_<inputs_dim>_<bottom_units, 32:32>_"
-    ),
-}
+# from .dense import Dense
+# from .mmoe import ML_MMoE
+# from .split import SplitMTL
+# from .submodules import DNN
+
+# # todo: 迁移至 README.md
+# type2help = {
+#     "cvcnet": (
+#         "cvcnet-mtl-mlp_<inputs_dim>"
+#         "_<num_layers>_<num_tasks_experts>_<num_shared_experts>"
+#         "_<expert_units, 32:32>_<tower_units, 32:32>"
+#     ),
+#     "split-mtl": (
+#         "仅在输出层进行多任务划分的模型。Bottom 块为 DNN，输出层为 DNN。"
+#         "split-mtl_<inputs_dim>_<bottom_units, 32:32>_"
+#     ),
+# }
 
 type2model = {
-    "dense": Dense,
     "cvcnet-mtl-mlp": CVCNet,
-    "mmoe-mtl-mlp": ML_MMoE,
-    "dnn": DNN,
-    "split-mtl": SplitMTL,
+    # "dense": Dense,
+    # "mmoe-mtl-mlp": ML_MMoE,
+    # "dnn": DNN,
+    # "split-mtl": SplitMTL,
 }
 
 

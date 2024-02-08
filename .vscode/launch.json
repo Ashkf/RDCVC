@@ -4,7 +4,7 @@
     "configurations": [
         {
             "name": "GA_Optimization",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "src/RDCVC/scripts/optimize_GA.py",
             "console": "integratedTerminal",
@@ -20,7 +20,7 @@
         },
         {
             "name": "Split-cuda_train",
-            "type": "python",
+            "type": "debugpy",
             "cwd": "${workspaceFolder}",
             "request": "launch",
             "program": "src/RDCVC/scripts/train_cvcnet-cuda.py",
@@ -80,7 +80,7 @@
         },
         {
             "name": "Python: 当前文件",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "program": "${file}",
