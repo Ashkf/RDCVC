@@ -6,16 +6,19 @@
 * Soochow University
 * Created: 2024-02-07 00:20:50
 * ----------------------------
-* Modified: 2024-02-08 00:46:33
+* Modified: 2024-02-09 00:04:07
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
+*
+* 2024-02-08 23:59:4	FK	complete
 """
 
+import torch
 from torch import Tensor
 
 
-class StandardScaler_torch:
+class StandardScalerTorch:
     """通过减去平均值并缩放至单位方差来标准化特征。
 
     样本 `x` 的 zscore 计算公式为：
@@ -64,8 +67,9 @@ class StandardScaler_torch:
         self.n_features_in_ = X.shape[1]
         self.n_samples_seen_ = X.shape[0]
         self.mean_ = X.mean(dim=0)
-        self.var_ = X.var(dim=0)
-        self.scale_ = self.var_.sqrt()
+        self.var_ = X.var(dim=0, correction=False)
+        self.scale_ = X.std(dim=0, correction=False)
+        return self
 
     def transform(self, X: Tensor) -> Tensor:
         """通过居中和缩放进行标准化。
@@ -84,7 +88,7 @@ class StandardScaler_torch:
         if (self.scale_ == 0).any():
             raise ValueError("标准差为 0 时，无法进行缩放")
 
-        return (X - self.mean_) / self.scale_
+        return (X - self.mean_) / torch.max(self.scale_, torch.tensor(1e-7))
 
     def inverse_transform(self, X: Tensor) -> Tensor:
         """将数据缩放回原始表征。

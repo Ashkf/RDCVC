@@ -3,33 +3,74 @@ name = "RDCVentilationControl"
 version = "0.0.1"
 description = "RDC's ventilation control project."
 authors = [{ name = "ashkf", email = "ifan.kai@outlook.com" }]
-readme = {file = "README.md", content-type = "text/markdown"}
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
-dependencies = [
-    "python=3.10.11",
-    "torch=2.1.0",
-    "pip=23.2.1",
-    "matplotlib=3.7.1",
-    "numpy=1.25.0",
-    "pandas=1.5.3",
-    "Pillow=9.4.0",
-    "PyYAML=6.0.0",
-    "Requests=2.29.0",
-    "scikit-learn=1.2.2",
-    "torchmetrics=0.11.4",
-    "tqdm=4.65.0",
-    "torchinfo=1.8.0",
-    "cnocr=2.2.3.2",
-    "pyDOE2=1.3.0",
-    "scienceplots=2.0.1",
-    "torchview=0.2.6",
-    "geatpy=2.7.0",
-]
+
+
+[tool.poetry]
+name = "RDCVentilationControl"
+version = "0.0.1"
+description = "RDC's ventilation control project."
+authors = ["KAI <ifan.kai@outlook.com>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+
+
+# 在这里添加项目依赖。
+#   只需要添加自己 `import` 时引用了哪些第三方依赖，不需要写明依赖的依赖。
+# 版本号规则：
+#   1. "^2.24.0" 表示 "2.24.0 ~ 3.0.0" 区间 (左边是大于等于，右边是小于).
+#   2. "~2.24.0" 表示 "2.24.0 ~ 2.25.0" 区间 (左边是大于等于，右边是小于).
+#   3. "*" 表示任意版本号，poetry 会优先选取最新版。
+#   更多规则请见 https://python-poetry.org/docs/dependency-specification/#version-constraints
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = { version = "~2.1.0", source = "torch" }
+matplotlib = "^3.8.2"
+numpy = "^1.26.3"
+pandas = "~1.5.0"
+pillow = "^10.2.0"
+pyyaml = "^6.0.1"
+requests = "^2.31.0"
+scikit-learn = "^1.4.0"
+torchmetrics = "~0.11.4"
+tqdm = "^4.66.1"
+torchinfo = "^1.8.0"
+pydoe2 = "^1.3.0"
+scienceplots = "^2.1.1"
+geatpy = "^2.7.0"
+tensorboardx = "^2.6.2.2"
+tensorboard = "^2.15.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+ruff = "^0.2.0"
+black = "^24.1.1"
+mypy = "^1.8.0"
+pandas-stubs = "^2.1.4.231227"
+
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cpu/"
+priority = "supplemental"
+
+# 添加清华镜像
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
+priority = "default"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 
 # https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html
 [tool.black]
 line-length = 88
 preview = true
+
 
 # https://beta.ruff.rs/docs/settings/
 [tool.ruff]
@@ -58,3 +99,7 @@ convention = "google"
 
 [tool.ruff.isort]
 known-first-party = ["REPLACE_PACKAGE_NAME"]
+
+
+[tool.mypy]
+mypy_path = "src"

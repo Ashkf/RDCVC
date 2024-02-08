@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:04:13
 * ----------------------------
-* Modified: 2023-12-03 09:51:44
+* Modified: 2024-02-09 00:18:22
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -76,7 +76,7 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         else:
             df = pd.read_csv(args.eval_path)
         _data = df[self.data_key + self.target_key].copy()
-        self.data: dict = self.preproces_data(_data)
+        self.data: Dict[str, Tensor] = self.preproces_data(_data)
 
     def __getitem__(self, index) -> tuple[Tensor, Tensor]:
         """Retrieves the data at the specified index.
@@ -110,12 +110,12 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         _data: DataFrame = data[self.data_key].copy()
         _target: DataFrame = data[self.target_key].copy()
 
-        # ----------------------- normalize ---------------------- #
-        _data = self.scaler.scale(_data, "x", self.is_train)
-        _target = self.scaler.scale(_target, "y", self.is_train)
-
         # ------------------------ to tensor --------------------- #
         _data = torch.tensor(_data.values, dtype=torch.float32).to(self.device)
         _target = torch.tensor(_target.values, dtype=torch.float32).to(self.device)
+
+        # ----------------------- normalize ---------------------- #
+        _data = self.scaler.scale(_data, "x", self.is_train)
+        _target = self.scaler.scale(_target, "y", self.is_train)
 
         return {"data": _data, "target": _target}
