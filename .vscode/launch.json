@@ -62,7 +62,7 @@
                 "--train_path=data/train/rdc_data_cleaned_train.csv",
                 "--eval_path=data/test/rdc_data_cleaned_eval.csv",
                 "--seed=42",
-                "--device=cpu",
+                // "--device=cpu",
                 "--lr=2e-2",
                 "--lr_scheduler",
                 "--lrsmin=1e-5",

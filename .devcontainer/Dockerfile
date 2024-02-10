@@ -13,6 +13,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     rm -rf /var/lib/apt/lists/* && \
     # 安装Poetry
     pip install poetry && \
+    poetry config virtualenvs.in-project true && \
     rm -r /root/.cache/pip
 
 WORKDIR /workspace
