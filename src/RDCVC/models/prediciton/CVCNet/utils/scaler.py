@@ -84,7 +84,7 @@ class Scaler:
             )
 
         normalizer = self.normalizers[prefix]
-        data = normalizer.inverse_transform(data.detach().to("cpu"))
+        data = normalizer.inverse_transform(data.detach())
         return data
 
     def normalize(
