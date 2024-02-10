@@ -1,12 +1,16 @@
 # devcontainer 说明
 
-+ pytorch_docker 生成纯洁的 pytorch+cuda+python 的 docker 镜像
+两个方案：
+
+1. pytorch_docker + pip
+2. python + poetry
+
+## pytorch_docker + pip
+
++ [pytorch_docker](https://github.com/cnstark/pytorch-docker) 生成纯洁的 pytorch+cuda+python 的 docker 镜像
 + vscode devcontainer 生成最终的 vscode 开发环境
-
-## pytorch_docker
-
-[Github](https://github.com/cnstark/pytorch-docker)
-
++ 使用 pip 进行包管理
+  
 ### Generate Build Script
 
 Generate build script by following command (available versions see [Available Versions](#Available-Versions)):
@@ -37,7 +41,15 @@ optional arguments:
 ```
 scripts/build_xxx.sh
 ```
-## vscode devcontainer
+
+## python + poetry
+
++ 使用官方的 python 镜像编写 Dockerfile
++ 容器中，使用 poetry 进行包管理
+
+优势：包的管理更加清晰，具体信息储存在 pyproject.toml 与 poetry.lock 中。
+
+## vscode .devcontainer
 
 include:
 + vscode extension

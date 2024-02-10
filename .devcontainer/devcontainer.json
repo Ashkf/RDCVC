@@ -3,7 +3,10 @@
 {
 	"name": "RDCVC_ENV",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "cnstark/pytorch:2.0.1-py3.10.11-cuda11.8.0-ubuntu22.04",
+	"build": {
+		// Path is relative to the devcontainer.json file.
+		"dockerfile": "Dockerfile"
+	},
 	"runArgs": [
 		"--gpus=all",
 		"--shm-size=32g",
@@ -11,22 +14,16 @@
 	],
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
 	"workspaceFolder": "/workspace",
-	"onCreateCommand": "pip install -r requirements.txt",
+	"onCreateCommand": "poetry lock && poetry install --no-root",
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2.3.1": {
-			"username": "automatic",
-			"uid": "automatic",
-			"gid": "automatic"
-		},
-		"ghcr.io/devcontainers/features/git:1": "latest",
-		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": [
-				"graphviz",
-				"build-essential"
-			]
-		}
-	},
+	// "features": {
+	// 	"ghcr.io/devcontainers/features/common-utils:2.3.1": {
+	// 		"username": "automatic",
+	// 		"uid": "automatic",
+	// 		"gid": "automatic"
+	// 	},
+	// 	"ghcr.io/devcontainers/features/git:1": "latest"
+	// },
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
@@ -277,7 +274,19 @@
 				"workbench.tree.renderIndentGuides": "always",
 				"notebook.undoRedoPerCell": false,
 				"notebook.output.textLineLimit": 14,
-				"notebook.scrolling.experimental.anchorToFocusedCell": "off"
+				"notebook.scrolling.experimental.anchorToFocusedCell": "off",
+				"editor.minimap.enabled": false,
+				"editor.accessibilitySupport": "on",
+				"markdown.extension.preview.autoShowPreviewToSide": true,
+				"workbench.editor.enablePreviewFromQuickOpen": true,
+				"git.autofetch": true,
+				"colorIdentifiersMode.method": "hash",
+				"colorIdentifiersMode.tokenKinds": [
+					"python",
+					"variable",
+					"parameter",
+					"property"
+				]
 			}
 		}
 	}
