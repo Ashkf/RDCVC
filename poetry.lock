@@ -2042,6 +2042,32 @@ url = "https://download.pytorch.org/whl/cu118"
 reference = "torch"
 
 [[package]]
+name = "torch-tb-profiler"
+version = "0.4.3"
+description = "PyTorch Profiler TensorBoard Plugin"
+optional = false
+python-versions = ">=3.6.2"
+files = [
+    {file = "torch_tb_profiler-0.4.3-py3-none-any.whl", hash = "sha256:207a49b05572dd983e4ab29eb5e0fcadd60374a8f93c78ec638217e8d18788dc"},
+    {file = "torch_tb_profiler-0.4.3.tar.gz", hash = "sha256:8b8d29b2de960b3c4423087b23cec29beaf9ac3a8c7b046c18fd25b218f726b1"},
+]
+
+[package.dependencies]
+pandas = ">=1.0.0"
+tensorboard = ">=1.15,<2.1.0 || >2.1.0"
+
+[package.extras]
+blob = ["azure-storage-blob"]
+gs = ["google-cloud-storage"]
+hdfs = ["fsspec", "pyarrow"]
+s3 = ["boto3"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "tsinghua"
+
+[[package]]
 name = "torchinfo"
 version = "1.8.0"
 description = "Model summary in PyTorch, based off of the original torchsummary."
@@ -2175,6 +2201,22 @@ url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 reference = "tsinghua"
 
 [[package]]
+name = "types-tqdm"
+version = "4.66.0.20240106"
+description = "Typing stubs for tqdm"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-tqdm-4.66.0.20240106.tar.gz", hash = "sha256:7acf4aade5bad3ded76eb829783f9961b1c2187948eaa6dd1ae8644dff95a938"},
+    {file = "types_tqdm-4.66.0.20240106-py3-none-any.whl", hash = "sha256:7459b0f441b969735685645a5d8480f7912b10d05ab45f99a2db8a8e45cb550b"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+reference = "tsinghua"
+
+[[package]]
 name = "typing-extensions"
 version = "4.9.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2237,4 +2279,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "0f9f73fed203693a5b48a4f98a6ba9eb8b6938d680e01ff355b16ec79ae0a548"
+content-hash = "6a5d2790bc845b0263a1c1b1c346f5454173ac84c7533852b2f3db91530055f9"
