@@ -57,7 +57,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "cvcnet-mtl-mlp_18_2_5_9_64:64:64_32:32:32_1:5",
+                "cvcnet-mtl-mlp_18_2_5_9_64-64-64_32-32-32_1-5",
                 "cvcnet",
                 "--train_path=data/train/rdc_data_cleaned_train.csv",
                 "--eval_path=data/test/rdc_data_cleaned_eval.csv",

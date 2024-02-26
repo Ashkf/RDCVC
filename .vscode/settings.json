@@ -8,7 +8,7 @@
     ],
     "todo-tree.tree.scanMode": "workspace",
     "python.testing.pytestArgs": [
-        "src/tests/RDCVC"
+        "src"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,

@@ -3,6 +3,8 @@
 import 自己的模型到 model_entry 的字典中
 """
 
+from typing import List, Union
+
 import torch
 import torch.nn as nn
 
@@ -15,11 +17,6 @@ from .cvcnet import CVCNet
 
 # # todo: 迁移至 README.md
 # type2help = {
-#     "cvcnet": (
-#         "cvcnet-mtl-mlp_<inputs_dim>"
-#         "_<num_layers>_<num_tasks_experts>_<num_shared_experts>"
-#         "_<expert_units, 32:32>_<tower_units, 32:32>"
-#     ),
 #     "split-mtl": (
 #         "仅在输出层进行多任务划分的模型。Bottom 块为 DNN，输出层为 DNN。"
 #         "split-mtl_<inputs_dim>_<bottom_units, 32:32>_"
@@ -40,15 +37,15 @@ def select_model(model_type: str):
     _type = model_type.split("_")
 
     if _type[0] == "cvcnet-mtl-mlp":  # 标准的 CVCNet 模型
-        # cvcnet-mtl-mlp_18_2_5_9_64:64:64_32:32:32
+        # cvcnet-mtl-mlp_18_2_5_9_64-64-64_32-32-32
         return type2model[_type[0]](
             inputs_dim=int(_type[1]),
             target_dict={"Airflow": 4, "Pres": 6},
             num_layers=int(_type[2]),
             num_tasks_experts=int(_type[3]),
             num_shared_experts=int(_type[4]),
-            expert_units=[int(v) for v in (_type[5]).split(":")],
-            tower_units=[int(v) for v in _type[6].split(":")],
+            expert_units=[int(v) for v in (_type[5]).split("-")],
+            tower_units=[int(v) for v in _type[6].split("-")],
         )
     elif _type[0] == "stl-mlp":
         return
@@ -106,7 +103,7 @@ def _init_model_kaiming(model):
     return model
 
 
-def equip_device(model: torch.nn.Module, device: [str, [int]]):
+def equip_device(model: torch.nn.Module, device: List[Union[str, int]]):
     """Equip the model with the specified device for processing.
 
     Args:
