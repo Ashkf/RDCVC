@@ -22,8 +22,7 @@ Learning, and Multi-Objective Optimization using Neural Networks and Optimizatio
 |   --save_prefix   |               'pref'                | 训练时：实验的名字，可以备注自己改了那些重要组件，具体的参数，会用于创建保存模型的目录；测试时：测试的名字，可以备注测试时做了哪些配置，会用于创建保存测试结果的目录 |
 | --load_model_path | 'checkpoints/base_model_pref/0.pth' | 模型加载路径，训练时，作为预训练模型路径，测试时，作为待测模型路径，                                                                                                 |
 | --load_not_strict |                                     | 'allow to load only common state dicts'                                                                                                                              |
-|    --val_list     | '/data/dataset1/list/base/val.txt'  | 训练时可以传入验证集 path，测试时可以传入测试集 path                                                                                                                 |
-|      --gpus       |                                     |                                                                                                                                                                      |
+|    --val_list     | '/data/dataset1/list/base/val.txt'  | 训练时可以传入验证集 path，测试时可以传入测试集 path                                                                                                                 |                                                                                                                                                                 |
 
 #### TRAIN
 

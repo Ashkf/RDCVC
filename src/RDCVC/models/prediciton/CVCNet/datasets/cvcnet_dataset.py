@@ -1,12 +1,12 @@
 """
 * dataset for CVCNet
 *
-* File: bim_cpn_dataset.py
+* File: cvcnet_dataset.py
 * Author: Fan Kai
 * Soochow University
 * Created: 2023-11-19 03:04:13
 * ----------------------------
-* Modified: 2024-06-01 13:03:00
+* Modified: 2024-06-01 15:29:06
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -37,7 +37,6 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         self.device = device
         self.normalize_target = args.normalize_target  # 归一化的目标
         self.normalize_method = args.normalize_method  # 归一化的方法
-        self.device = args.device[0]
         self.target_key = [
             "TOT_FRSH_VOL",
             "TOT_SUPP_VOL",

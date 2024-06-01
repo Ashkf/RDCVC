@@ -3,8 +3,6 @@
 import 自己的模型到 model_entry 的字典中
 """
 
-from typing import List, Union
-
 import torch
 import torch.nn as nn
 
@@ -114,14 +112,12 @@ def _init_model_kaiming(model):
     return model
 
 
-def equip_device(model: torch.nn.Module, device: List[Union[str, int]]):
+def equip_device(model: torch.nn.Module, device: str):
     """Equip the model with the specified device for processing.
 
     Args:
         model (torch.nn.Module): The model to be equipped with the device.
-        device (List[str, List[int]]): The device to be used for processing.
-            The first element of the list should be either 'cpu' or 'cuda'.
-            If 'cuda' is chosen, the second element should be a list of GPU device IDs.
+        device (str): The device to be used for processing.
 
     Returns:
         torch.nn.Module: The model equipped with the specified device.
@@ -130,12 +126,11 @@ def equip_device(model: torch.nn.Module, device: List[Union[str, int]]):
         RuntimeError: If CUDA is not available when 'cuda' is chosen as the device.
         ValueError: If an invalid device type is provided. Supported types are 'cpu' and 'cuda'.
     """
-    if device[0] == "cpu":
+    if device == "cpu":
         model = model.to("cpu")  # CPU processing
-    elif device[0] == "cuda":
+    elif device == "cuda":
         if torch.cuda.is_available():
-            # Multi-GPU parallel processing
-            model = torch.nn.DataParallel(model, device_ids=device[1]).to("cuda")
+            model = model.to("cuda")
         else:
             raise RuntimeError("CUDA is not available.")
     else:
