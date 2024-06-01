@@ -23,6 +23,7 @@ class Scaler:
         self.normalize_method = args.normalize_method  # 归一化的方法
         self.save_path = args.model_dir  # 保存归一化器的地址
         self.normalizers: dict = {}
+        self.device = args.device
 
     @torch.no_grad()
     def scale(
@@ -36,7 +37,7 @@ class Scaler:
 
         Args:
             data(Tensor): 数据
-            data_type(str): 数据类型
+            data_type(str): 数据类型 (x, y, none)
             is_train(bool): 是否是训练集
             mode(ScalerMode): 工作模式
 
@@ -108,26 +109,23 @@ class Scaler:
             case _:
                 raise ValueError(f"归一化方法未知，normalize_method={method}")
 
-        if os.path.exists(os.path.join(save_path, prefix + "_normalizer.pkl")):
+        if os.path.exists(os.path.join(save_path, f"{prefix}_normalizer.pkl")):
             # 检查地址下是否已有归一化器，若有则直接使用。
-            with open(os.path.join(save_path, prefix + "_normalizer.pkl"), "rb") as f:
+            with open(os.path.join(save_path, f"{prefix}_normalizer.pkl"), "rb") as f:
                 _normalizer = pickle.load(f)
                 if type(_normalizer) is not type(normalizer):
                     raise TypeError("归一化器类型错误！")
                 self.normalizers[prefix] = _normalizer
             data = _normalizer.transform(data)  # 使用现有归一化器
+        elif is_train:
+            # 若无，则使用训练集的数据训练一个归一化器，并保存。
+            data = normalizer.fit_transform(data)  # 更新 df 的值
+            # 保存归一化器
+            with open(os.path.join(save_path, f"{prefix}_normalizer.pkl"), "wb") as f:
+                pickle.dump(normalizer, f)
+            self.normalizers[prefix] = normalizer
         else:
-            if is_train:
-                # 若无，则使用训练集的数据训练一个归一化器，并保存。
-                data = normalizer.fit_transform(data)  # 更新 df 的值
-                # 保存归一化器
-                with open(
-                    os.path.join(save_path, prefix + "_normalizer.pkl"), "wb"
-                ) as f:
-                    pickle.dump(normalizer, f)
-                self.normalizers[prefix] = normalizer
-            else:
-                # 若无，且是测试集，则报错。
-                raise FileNotFoundError("未找到归一化器，请先训练模型！")
+            # 若无，且是测试集，则报错。
+            raise FileNotFoundError("未找到归一化器，请先训练模型！")
 
-        return data
+        return data.to(self.device)

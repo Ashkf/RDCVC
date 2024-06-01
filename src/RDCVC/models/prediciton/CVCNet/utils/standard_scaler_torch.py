@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-02-07 00:20:50
 * ----------------------------
-* Modified: 2024-03-20 16:58:46
+* Modified: 2024-06-01 16:01:41
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -30,6 +30,8 @@ class StandardScalerTorch:
 
     通过计算训练集中样本的相关统计数据，对每个特征进行独立的居中和缩放。
     然后存储平均值和标准偏差，以便在以后的数据中使用
+
+    Scaler 的计算过程均在 CPU 上进行。
 
     Attributes:
         mean_ (Tensor): 每个特征的平均值。
@@ -97,7 +99,7 @@ class StandardScalerTorch:
         if (self.scale_ == 0).any():
             raise ValueError("标准差为 0 时，无法进行缩放")
 
-        return (X - self.mean_) / torch.max(self.scale_, torch.tensor(1e-7))
+        return (X.cpu() - self.mean_) / torch.max(self.scale_, torch.tensor(1e-7))
 
     def inverse_transform(self, X: Tensor | ndarray) -> Tensor:
         """将数据缩放回原始表征。
@@ -115,7 +117,7 @@ class StandardScalerTorch:
         if isinstance(X, ndarray):
             X = torch.tensor(X, device=self.mean_.device, dtype=self.mean_.dtype)
 
-        return X * self.scale_ + self.mean_
+        return X.cpu() * self.scale_ + self.mean_
 
     def fit_transform(self, X: Tensor | ndarray) -> Tensor:
         """先拟合数据，然后转换它。

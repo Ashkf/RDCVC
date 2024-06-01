@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:03:55
 * ----------------------------
-* Modified: 2024-03-24 20:17:42
+* Modified: 2024-06-01 15:50:54
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -70,10 +70,10 @@ class Trainer:
         self.logger = Logger(self.args)  # 初始化 Logger
         self.scaler = Scaler(self.args)  # 初始化特征缩放器
         self.train_dataloader = select_train_loader(
-            self.args, self.logger.logger, self.scaler
+            self.args, self.logger.logger, self.scaler, self.args.device
         )
         self.val_dataloader = select_eval_loader(
-            self.args, self.logger.logger, self.scaler
+            self.args, self.logger.logger, self.scaler, self.args.device
         )
         self.model = self.prepare_model()
         self.metrics_computer = self.prepare_metrics_computer()
@@ -160,7 +160,6 @@ class Trainer:
         """
         self.model.train()  # switch to train mode
         self.metrics_computer.calc_loss_weight(self.args)  # 计算 loss_weight
-        _device = self.args.device[0]
         """遍历整个 train_loader """
         for index_batch, items_batch in enumerate(self.train_dataloader):
             _data, _target = items_batch

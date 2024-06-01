@@ -10,10 +10,12 @@ from torch.utils.data import DataLoader
 
 from .cvcnet_dataset import CVCNetDataset
 from .iotdp_dataset import IoTDamperDataset
+from .rdcvc_dataset import RDCVCDataset
 
 type2data = {
     "cvcnet": CVCNetDataset,
     "iotdp": IoTDamperDataset,
+    "rdcvc": RDCVCDataset,
 }
 
 
