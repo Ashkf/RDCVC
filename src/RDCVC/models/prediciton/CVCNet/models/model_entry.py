@@ -7,12 +7,13 @@ import torch
 import torch.nn as nn
 
 from .cvcnet import CVCNet
+from .dense import Dense
 from .IoTDamper_mlp import DAPN12
+from .kan_efficient import KANe
 from .mlp import MLP
+from .mmoe import ML_MMoE
+from .split import SplitMTL
 
-# from .dense import Dense
-# from .mmoe import ML_MMoE
-# from .split import SplitMTL
 # from .submodules import DNN
 
 # # todo: 迁移至 README.md
@@ -25,49 +26,54 @@ from .mlp import MLP
 
 type2model = {
     "cvcnet-mtl-mlp": CVCNet,
-    # "dense": Dense,
-    # "mmoe-mtl-mlp": ML_MMoE,
-    # "dnn": DNN,
-    # "split-mtl": SplitMTL,
+    "dense": Dense,
+    "mmoe-mtl-mlp": ML_MMoE,
+    "split-mtl": SplitMTL,
     "dapn12": DAPN12,
     "mlp": MLP,
+    "kane": KANe,
 }
 
 
 def select_model(model_type: str):
     """入口，选择模型结构"""
     _type = model_type.split("_")
+    _model_name = _type[0]
 
-    if _type[0] == "cvcnet-mtl-mlp":  # 标准的 CVCNet 模型
-        # cvcnet-mtl-mlp_18_2_5_9_64-64-64_32-32-32
-        return type2model[_type[0]](
-            inputs_dim=int(_type[1]),
-            target_dict={"Airflow": 4, "Pres": 6},
-            num_layers=int(_type[2]),
-            num_tasks_experts=int(_type[3]),
-            num_shared_experts=int(_type[4]),
-            expert_units=[int(v) for v in (_type[5]).split("-")],
-            tower_units=[int(v) for v in _type[6].split("-")],
-        )
-    elif _type[0] == "mlp":
-        return type2model[_type[0]](
-            width=[int(v) for v in _type[1].split("-")],
-            activation_fn=_type[2],
-        )
-    elif _type[0] == "dapn12":
-        return type2model[_type[0]]()
-    elif _type[0] == "stl-mlp":
-        return
-    elif _type[0] == "split-mtl":
-        return type2model[_type[0]](
-            inputs_dim=int(_type[1]),
-            target_dict={"Airflow": 4, "Pres": 6},
-            bottom_units=[int(v) for v in _type[2].split(":")],
-        )
-    else:
-        raise ValueError(
-            f"模型类型 {model_type} 不存在，请检查输入的模型类型是否正确。"
-        )
+    match _model_name:
+        case "cvcnet-mtl-mlp":
+            # e.g.: cvcnet-mtl-mlp_18_2_5_9_64-64-64_32-32-32
+            return CVCNet(
+                inputs_dim=int(_type[1]),
+                target_dict={"Airflow": 4, "Pres": 6},
+                num_layers=int(_type[2]),
+                num_tasks_experts=int(_type[3]),
+                num_shared_experts=int(_type[4]),
+                expert_units=[int(v) for v in (_type[5]).split("-")],
+                tower_units=[int(v) for v in _type[6].split("-")],
+            )
+        case "mlp":
+            return MLP(
+                width=[int(v) for v in _type[1].split("-")],
+                activation_fn=_type[2],
+            )
+        case "dapn12":
+            return DAPN12()
+        case "stl-mlp":
+            return
+        case "split-mtl":
+            return SplitMTL(
+                inputs_dim=int(_type[1]),
+                target_dict={"Airflow": 4, "Pres": 6},
+                bottom_units=[int(v) for v in _type[2].split(":")],
+            )
+        case "kane":
+            # e.g.: kane_1-1-1
+            return KANe(layers_hidden=[int(v) for v in _type[1].split("-")])
+        case default:
+            raise ValueError(
+                f"模型类型 {default} 不存在，请检查输入的模型类型是否正确。"
+            )
 
 
 def init_model(model, args, logger):
