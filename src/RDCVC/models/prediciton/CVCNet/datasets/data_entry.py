@@ -17,7 +17,7 @@ type2data = {
 }
 
 
-def get_dataset(args, is_train=False, scaler=None):
+def get_dataset(args, is_train=False, scaler=None, device=None):
     """构造了字典 type2data，返回 Dataset
 
     Args:
@@ -28,26 +28,18 @@ def get_dataset(args, is_train=False, scaler=None):
     Returns:
         Dataset
     """
-    dataset = type2data[args.data_type](args, is_train=is_train, scaler=scaler)
-    return dataset
+    return type2data[args.data_type](
+        args, is_train=is_train, scaler=scaler, device=device
+    )
 
 
-def select_train_loader(args, logger, scaler=None) -> DataLoader:
-    """
-    选择 train 的 dataloader
-
-    Args:
-        scaler:
-        logger ():
-        args ():
-
-    Returns:
-        DataLoader
-    """
+def select_train_loader(args, logger, scaler=None, device=None) -> DataLoader:
     # 通常我们在 train 中需要 dataloader，在 eval/test 中需要 dataset。
-    train_dataset = get_dataset(args, is_train=True, scaler=scaler)  # 获取 Dataset
-    logger.info("{} samples found in train".format(len(train_dataset)))
-    train_dataloader = DataLoader(
+    train_dataset = get_dataset(
+        args, is_train=True, scaler=scaler, device=device
+    )  # 获取 Dataset
+    logger.info(f"{len(train_dataset)} samples found in train")
+    return DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         shuffle=args.shuffle,
@@ -55,13 +47,12 @@ def select_train_loader(args, logger, scaler=None) -> DataLoader:
         pin_memory=False,
         drop_last=False,
     )
-    return train_dataloader
 
 
-def select_eval_loader(args, logger, scaler=None) -> DataLoader:
+def select_eval_loader(args, logger, scaler=None, device=None) -> DataLoader:
     eval_dataset = get_dataset(args, scaler=scaler)
-    logger.info("{} samples found in eval".format(len(eval_dataset)))
-    eval_loader = DataLoader(
+    logger.info(f"{len(eval_dataset)} samples found in eval")
+    return DataLoader(
         eval_dataset,
         batch_size=len(eval_dataset),  # 读取全部测试集数据
         shuffle=False,
@@ -69,4 +60,3 @@ def select_eval_loader(args, logger, scaler=None) -> DataLoader:
         pin_memory=False,
         drop_last=False,
     )
-    return eval_loader
