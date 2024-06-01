@@ -8,7 +8,7 @@
 * Soochow University
 * Created: 2024-01-02 03:12:29
 * ----------------------------
-* Modified: 2024-01-07 11:30:14
+* Modified: 2024-03-20 15:21:42
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -21,7 +21,7 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 # 导入自定义运行接口
-# from RDCVC.models.optimization.GA.SN1.run import run as run_SN1  # noqa: E402
+from RDCVC.models.optimization.GA.SN1.run import run as run_SN1  # noqa: E402
 from RDCVC.models.optimization.utils.Args import (  # noqa: E402
     ArgsManagerMode,
     GAArgsManager,

@@ -4,7 +4,8 @@
     "conventionalCommits.scopes": [
         "CVCNet",
         "trainer",
-        "optimization"
+        "optimization",
+        "prediction"
     ],
     "todo-tree.tree.scanMode": "workspace",
     "python.testing.pytestArgs": [

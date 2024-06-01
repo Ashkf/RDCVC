@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:04:13
 * ----------------------------
-* Modified: 2024-02-09 00:18:22
+* Modified: 2024-03-09 21:32:50
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -42,12 +42,12 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
             "TOT_SUPP_VOL",
             "TOT_EXH_VOL",
             "TOT_RET_VOL",
-            "RM1_PRES",
-            "RM2_PRES",
-            "RM3_PRES",
-            "RM4_PRES",
-            "RM5_PRES",
-            "RM6_PRES",
+            "RM1_PRES",  # a
+            "RM2_PRES",  # b
+            "RM3_PRES",  # d
+            "RM4_PRES",  # e
+            "RM5_PRES",  # f
+            "RM6_PRES",  # c
         ]
         self.data_key = [
             "MAU_FREQ",

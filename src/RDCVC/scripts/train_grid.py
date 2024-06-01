@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-02-10 17:04:51
 * ----------------------------
-* Modified: 2024-02-26 14:41:38
+* Modified: 2024-02-26 15:02:35
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -27,10 +27,10 @@ if __name__ == "__main__":
     # 设定参数网格
     param_combs = list(
         itertools.product(
-            num_e_layers := [1],
-            num_tasks_experts := [1],
-            num_shared_experts := [1],
-            batch_size := [16],
+            num_e_layers := [1, 2, 3, 4, 5],
+            num_tasks_experts := [1, 2, 3, 4, 5],
+            num_shared_experts := [1, 2, 3, 4, 5],
+            batch_size := [16, 32, 64],
             LWS := ["none", "DWA"],
         )
     )
