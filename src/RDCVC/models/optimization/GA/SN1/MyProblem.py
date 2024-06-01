@@ -11,7 +11,7 @@
 * Soochow University
 * Created: 2023-11-15 22:25:50
 * ----------------------------
-* Modified: 2024-01-12 00:47:55
+* Modified: 2024-03-25 21:02:32
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -24,6 +24,7 @@ import pickle
 import geatpy as ea
 import numpy as np
 import torch
+from pop_history import pop_history
 
 
 class SN1(ea.Problem):  # 继承 Problem 父类
@@ -70,6 +71,8 @@ class SN1(ea.Problem):  # 继承 Problem 父类
         """
         ref_pres = np.array([10, 15, 32, 32, 30, 25])  # 房间压差设计值
         ref_total_SV = 3760  # 总送风量设计参考值
+        ref_total_OV = 2312  # 新风量设计参考值
+        ref_total_RV = 1448  # 回风量设计参考值
         ref_total_EV = 1600  # 总排风量设计参考值
 
         # ---------- Calculate objective function value ---------- #
@@ -78,7 +81,7 @@ class SN1(ea.Problem):  # 继承 Problem 父类
         features = self._model_eval(pop.Phen)  # (num_pop, 28)
 
         # 参照文件末尾的变量顺序
-        # mau_freq = features[:, 0].reshape(-1, 1)
+        mau_freq = features[:, 0].reshape(-1, 1)
         # ahu_freq = features[:, 1].reshape(-1, 1)
         # ef_freq = features[:, 2].reshape(-1, 1)
         freq_mean = np.mean(features[:, :3], axis=1).reshape(-1, 1)
@@ -96,22 +99,40 @@ class SN1(ea.Problem):  # 继承 Problem 父类
 
         # ----------------- Calculate Constraint ----------------- #
         # 约束函数值为负表示满足约束，为正表示不满足约束，越大表示不满足约束程度越大
-        total_SV = features[:, -9]
+        total_RV = features[:, -7]
         total_EV = features[:, -8]
+        total_SV = features[:, -9]
+        total_OV = features[:, -10]
 
         # # 送风量约束，偏差不超过 10%
-        # c_TSV = np.abs(total_SV - ref_total_SV) / ref_total_SV - 0.1
+        # c_TSV = np.abs(total_SV - ref_total_SV) / ref_total_SV - 0.05
 
         # 送风量约束，大于设计值符合约束
-        c_TSV = ref_total_SV * 0.9 - total_SV
+        c_TSV = ref_total_SV - total_SV
 
-        # 排风量约束，大于设计值符合约束
-        c_TEV = ref_total_EV * 0.9 - total_EV
+        # 送风量约束，小于设计值 1.05 倍符合约束
+        # c_TSV_2 = total_SV - ref_total_SV * 1.05
+
+        # c_TOV = ref_total_OV - total_OV
+        # c_TOV = np.abs(total_OV - ref_total_OV) / ref_total_OV - 0.05
+
+        # c_TRV = ref_total_RV - total_RV
+        # c_TRV = np.abs(total_RV - ref_total_RV) / ref_total_RV - 0.05
+
+        c_TEV = ref_total_EV - total_EV
+        # c_TEV = total_EV - ref_total_EV * 1.1
+        # c_TEV = np.abs(total_EV - ref_total_EV) / ref_total_EV - 0.05
 
         # 房间压差约束，任意房间偏差不超过 5 Pa
         c_RP = np.max(room_pres_err, axis=1) - 3
 
+        # mau 频率约束，不小于 10Hz
+        # c_MAU = 10 - mau_freq
+
         pop.CV = np.column_stack([c_RP, c_TSV, c_TEV])
+        # ----------------- Save history data ----------------- #
+        pop_history["average_freq_mean"].append(np.mean(freq_mean))
+        pop_history["best_freq_mean"].append(np.min(freq_mean))
 
     def _model_eval(self, Phen):
         """基于神经网络代理模型，使用决策变量计算受控变量。
@@ -144,7 +165,7 @@ class SN1(ea.Problem):  # 继承 Problem 父类
         _model_out = torch.concat(_model_out, dim=1)
         # Controlled variables
         _ctrl_var = np.vstack(
-            scaler_y.inverse_transform(_model_out.detach().cpu().numpy())
+            scaler_y.inverse_transform(_model_out.detach()).cpu().numpy()
         )
 
         return np.hstack((_dcsn_var, _ctrl_var))

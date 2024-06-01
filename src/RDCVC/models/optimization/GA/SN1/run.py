@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-01-07 10:30:07
 * ----------------------------
-* Modified: 2024-01-07 18:28:59
+* Modified: 2024-03-25 20:49:56
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 import torch
 from MyProblem import SN1
+from pop_history import pop_history
 from rich import print
 from rich.rule import Rule
 
@@ -170,17 +171,7 @@ def _generate_archive_directory(
     return archive_directory
 
 
-if __name__ == "__main__":
-    args = {
-        "nind": 2000,  # 种群规模
-        "maxgen": 1000,  # 最大进化代数
-        "maxtime": 60,  # 最大运行时间 (s)
-        "nnpath": "/workspace/checkpoints/NN/split-mtl_18_10000:10000:10000:10000:10000:10000_BS128_LR0.0002_EP1000_2023-12-06T12-47-19/final_model.pth",  # 神经网络模型存档路径，
-        "scaler_path": [
-            "/workspace/checkpoints/NN/split-mtl_18_10000:10000:10000:10000:10000:10000_BS128_LR0.0002_EP1000_2023-12-06T12-47-19/x_normalizer.pkl",
-            "/workspace/checkpoints/NN/split-mtl_18_10000:10000:10000:10000:10000:10000_BS128_LR0.0002_EP1000_2023-12-06T12-47-19/y_normalizer.pkl",
-        ],  # 数据标准化器存档路径
-    }
+def main(args):
     # ---------------------- Preprocess ---------------------- #
     model = torch.load(args["nnpath"])
 
@@ -227,8 +218,25 @@ if __name__ == "__main__":
     # 保存进化过程的种群信息 (trace)
     # algorithm.trace 的结构：{'f_best': [], 'f_avg': []}
     pd.DataFrame(algorithm.trace).to_csv(save_dirName + "/" + "trace.csv", index=False)
+    pd.DataFrame(pop_history).to_csv(
+        save_dirName + "/" + "pop_history.csv", index=False
+    )
 
     # 保存最优解
     res = results_postprocess(res, problem._model_eval)
     with open(save_dirName + "/" + "BestResults.json", "w") as f:
         json.dump(res, f, indent=4)
+
+
+if __name__ == "__main__":
+    args = {
+        "nind": 10000,  # 种群规模
+        "maxgen": 2000,  # 最大进化代数
+        "maxtime": 60,  # 最大运行时间 (s)
+        "nnpath": "/workspace/checkpoints/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-02-26T15-33-04/final_model.pth",  # 神经网络模型存档路径，
+        "scaler_path": [
+            "/workspace/checkpoints/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-02-26T15-33-04/x_normalizer.pkl",
+            "/workspace/checkpoints/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-02-26T15-33-04/y_normalizer.pkl",
+        ],  # 数据标准化器存档路径
+    }
+    main(args)
