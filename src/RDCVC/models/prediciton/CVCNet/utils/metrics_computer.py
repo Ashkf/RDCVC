@@ -148,8 +148,10 @@ class MetricsComputer:
             _metrics = self._comp_metrices_byTasksType(pred, target, is_train=is_train)
         elif self.model_type.split("_")[0] == "split-mtl":
             _metrics = self._comp_metrices_byTasksType(pred, target, is_train=is_train)
+        elif self.model_type.split("_")[0] in ["mlp", "dapn12"]:
+            _metrics = self._comp_metrics_IoTDamper(pred, target, is_train=is_train)
         else:
-            raise ValueError("Unknown model type: {}".format(self.model_type))
+            raise ValueError(f"Unknown model type: {self.model_type}")
         self.metrics = _metrics
         return _metrics
 
@@ -173,7 +175,7 @@ class MetricsComputer:
                 ) from err
 
         # ---------------------------------- 计算损失 ----------------------------------
-        if _model_prefix == "cvcnet-mtl-mlp" or _model_prefix == "split-mtl":
+        if "mtl" in _model_prefix:
             loss = [
                 v
                 for k, v in metrics.items()
@@ -182,21 +184,13 @@ class MetricsComputer:
             ]
             loss = self._use_loss_weight(loss)
         else:
-            raise NotImplementedError(f"Unknown model type: {_model_type}")
+            loss = metrics["train/loss"]
         return loss
 
     def calc_loss_weight(self, args):
-        if (
-            self.loss_weight_strategy == "none"
-            or self.loss_weight_strategy == "sum_loss"
-        ):
+        if self.loss_weight_strategy in ["none", "sum_loss"]:
             _weight = np.ones((1, self.num_tasks))
-        elif (
-            self.loss_weight_strategy == "DWA"
-            or self.loss_weight_strategy == "LDWA"
-            or self.loss_weight_strategy == "WDWA"
-            or self.loss_weight_strategy == "LWDWA"
-        ):
+        elif self.loss_weight_strategy in ["DWA", "LDWA", "WDWA", "LWDWA"]:
             _loss_buffer = self.logger.recoder.train_loss_buffer
             _loss_weight_buffer = self.logger.recoder.loss_weight_buffer
 
@@ -248,6 +242,33 @@ class MetricsComputer:
 
     def _calc_loss_l1(self, pred, ground):
         return self._calc_mae(pred, ground)
+
+    def _comp_metrics_IoTDamper(self, pred: Tensor, target, is_train) -> dict:
+        """IoTDamper 风阀任务的指标计算
+
+
+        Args:
+            pred(Tensor): 模型输出。Tensor(batch_size, 1)
+            target(Tensor): 目标值。Tensor(batch_size, 1)
+
+        UPDATE: 2024-05-31
+        """
+        # ---------------------- 反归一化 (若对标签采取归一化) ----------------------
+        _pred = self.scaler.scale(
+            pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
+        ).to("cpu")
+        _target = self.scaler.scale(
+            target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
+        ).to("cpu")
+
+        # ------------------------ metrics ----------------------- #
+        prefix = "train/" if is_train else "val/"  # 前缀，用于区分训练和验证
+        return {
+            f"{prefix}loss": self._calc_loss_l2(_pred, _target),
+            f"{prefix}rmse": self._calc_rmse(_pred, _target),
+            f"{prefix}mae": self._calc_mae(_pred, _target),
+            f"{prefix}mape": self._calc_mape(_pred, _target),
+        }
 
     def _comp_metrices_byTasksType(self, pred: List[Tensor], target, is_train) -> dict:
         """按照任务类别计算指标

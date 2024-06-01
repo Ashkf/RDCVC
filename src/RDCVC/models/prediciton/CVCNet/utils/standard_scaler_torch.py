@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-02-07 00:20:50
 * ----------------------------
-* Modified: 2024-02-09 00:04:07
+* Modified: 2024-03-20 16:58:46
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -15,6 +15,7 @@
 """
 
 import torch
+from numpy import ndarray
 from torch import Tensor
 
 
@@ -49,11 +50,11 @@ class StandardScalerTorch:
             del self.mean_
             del self.var_
 
-    def fit(self, X: Tensor):
+    def fit(self, X: Tensor | ndarray):
         """Compute the mean and std to be used for later scaling.
 
         Args:
-            X (Tensor): 用于计算平均值和标准差的数据，
+            X (Tensor | ndarray): 用于计算平均值和标准差的数据，
                 以备沿特征轴进行缩放。shape: (n_samples, n_features)
 
         Returns:
@@ -61,8 +62,13 @@ class StandardScalerTorch:
         """
         self._reset()
 
-        if not isinstance(X, Tensor):
-            raise ValueError("类 StandardScaler_torch 仅支持 torch.Tensor 类型的输入")
+        if not isinstance(X, Tensor | ndarray):
+            raise ValueError(
+                "类 StandardScaler_torch 仅支持 torch.Tensor 或 ndarray 类型的输入"
+            )
+
+        if isinstance(X, ndarray):
+            X = torch.tensor(X)
 
         self.n_features_in_ = X.shape[1]
         self.n_samples_seen_ = X.shape[0]
@@ -71,11 +77,11 @@ class StandardScalerTorch:
         self.scale_ = X.std(dim=0, correction=False)
         return self
 
-    def transform(self, X: Tensor) -> Tensor:
+    def transform(self, X: Tensor | ndarray) -> Tensor:
         """通过居中和缩放进行标准化。
 
         Args:
-            X (Tensor): 用于沿特征轴缩放的数据。
+            X (Tensor | ndarray): 用于沿特征轴缩放的数据。
                 shape: (n_samples, n_features)
 
         Returns:
@@ -83,6 +89,9 @@ class StandardScalerTorch:
         """
         if not hasattr(self, "scale_"):
             raise ValueError("请先拟合数据，然后再进行转换")
+
+        if isinstance(X, ndarray):
+            X = torch.tensor(X, device=self.mean_.device, dtype=self.mean_.dtype)
 
         # 除 0 检查
         if (self.scale_ == 0).any():
@@ -90,11 +99,11 @@ class StandardScalerTorch:
 
         return (X - self.mean_) / torch.max(self.scale_, torch.tensor(1e-7))
 
-    def inverse_transform(self, X: Tensor) -> Tensor:
+    def inverse_transform(self, X: Tensor | ndarray) -> Tensor:
         """将数据缩放回原始表征。
 
         Args:
-            X (Tensor): 用于沿特征轴缩放的数据。
+            X (Tensor | ndarray): 用于沿特征轴缩放的数据。
                 shape: (n_samples, n_features)
 
         Returns:
@@ -103,13 +112,16 @@ class StandardScalerTorch:
         if not hasattr(self, "scale_"):
             raise ValueError("请先拟合数据，然后再进行转换")
 
+        if isinstance(X, ndarray):
+            X = torch.tensor(X, device=self.mean_.device, dtype=self.mean_.dtype)
+
         return X * self.scale_ + self.mean_
 
-    def fit_transform(self, X: Tensor) -> Tensor:
+    def fit_transform(self, X: Tensor | ndarray) -> Tensor:
         """先拟合数据，然后转换它。
 
         Args:
-            X (Tensor): 用于计算平均值和标准差的数据，
+            X (Tensor | ndarray): 用于计算平均值和标准差的数据，
                 shape: (n_samples, n_features)
 
         Returns:

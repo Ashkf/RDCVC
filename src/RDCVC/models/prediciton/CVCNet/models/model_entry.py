@@ -9,6 +9,8 @@ import torch
 import torch.nn as nn
 
 from .cvcnet import CVCNet
+from .IoTDamper_mlp import DAPN12
+from .mlp import MLP
 
 # from .dense import Dense
 # from .mmoe import ML_MMoE
@@ -29,6 +31,8 @@ type2model = {
     # "mmoe-mtl-mlp": ML_MMoE,
     # "dnn": DNN,
     # "split-mtl": SplitMTL,
+    "dapn12": DAPN12,
+    "mlp": MLP,
 }
 
 
@@ -47,6 +51,13 @@ def select_model(model_type: str):
             expert_units=[int(v) for v in (_type[5]).split("-")],
             tower_units=[int(v) for v in _type[6].split("-")],
         )
+    elif _type[0] == "mlp":
+        return type2model[_type[0]](
+            width=[int(v) for v in _type[1].split("-")],
+            activation_fn=_type[2],
+        )
+    elif _type[0] == "dapn12":
+        return type2model[_type[0]]()
     elif _type[0] == "stl-mlp":
         return
     elif _type[0] == "split-mtl":

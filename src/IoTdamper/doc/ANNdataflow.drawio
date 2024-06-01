@@ -1,0 +1,180 @@
+<mxfile host="app.diagrams.net" modified="2023-07-03T02:14:53.579Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67" etag="3FKzB66DzVOERl5myUQy" version="21.5.2" type="device">
+  <diagram name="第 1 页" id="NSDE08G9FTS4Pvcmb41p">
+    <mxGraphModel dx="865" dy="492" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="1" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="uRK713DsQqLtr2tAJrWb-23" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="78" y="160" width="562" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="lAnI6LW0uGow_RL-pVpy-2" target="lAnI6LW0uGow_RL-pVpy-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-2" value="Start" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;flipH=0;" parent="1" vertex="1">
+          <mxGeometry x="50" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="lAnI6LW0uGow_RL-pVpy-3" target="lAnI6LW0uGow_RL-pVpy-13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-3" value="实测压降p、前阀片开度θ、后阀片开度γ" style="whiteSpace=wrap;html=1;strokeWidth=2;flipH=0;" parent="1" vertex="1">
+          <mxGeometry x="198" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="lAnI6LW0uGow_RL-pVpy-11" target="lAnI6LW0uGow_RL-pVpy-19" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-11" value="输出预测风量" style="whiteSpace=wrap;html=1;strokeWidth=2;flipH=0;" parent="1" vertex="1">
+          <mxGeometry x="832" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="lAnI6LW0uGow_RL-pVpy-13" target="uRK713DsQqLtr2tAJrWb-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-13" value="标准化" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;flipH=0;" parent="1" vertex="1">
+          <mxGeometry x="357" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="lAnI6LW0uGow_RL-pVpy-16" target="lAnI6LW0uGow_RL-pVpy-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-16" value="反标准化" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;flipH=0;" parent="1" vertex="1">
+          <mxGeometry x="673" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-19" value="End" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;flipH=0;" parent="1" vertex="1">
+          <mxGeometry x="1000" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="lAnI6LW0uGow_RL-pVpy-27" target="uRK713DsQqLtr2tAJrWb-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-27" value="前阀片开度 θ" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" parent="1" vertex="1">
+          <mxGeometry x="140" y="210" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="lAnI6LW0uGow_RL-pVpy-28" target="uRK713DsQqLtr2tAJrWb-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-28" value="后阀片开度 γ" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" parent="1" vertex="1">
+          <mxGeometry x="140" y="280" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="lAnI6LW0uGow_RL-pVpy-29" target="uRK713DsQqLtr2tAJrWb-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lAnI6LW0uGow_RL-pVpy-29" value="压降 p" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;flipH=0;" parent="1" vertex="1">
+          <mxGeometry x="140" y="350" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-1" target="uRK713DsQqLtr2tAJrWb-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-1" value="$$\frac{\theta - μ_{\theta}}{\sigma_\theta}$$" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="299" y="210" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-7" target="uRK713DsQqLtr2tAJrWb-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-7" value="$$\frac{\gamma - μ_{\gamma}}{\sigma_\gamma}$$" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="299" y="280" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-8" target="uRK713DsQqLtr2tAJrWb-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-8" value="$$\frac{p - μ_{p}}{\sigma_p}$$" style="rounded=0;whiteSpace=wrap;html=1;flipH=0;" vertex="1" parent="1">
+          <mxGeometry x="299" y="350" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-10" value="θ&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" vertex="1" parent="1">
+          <mxGeometry x="432" y="210" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-11">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-11" value="γ&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" vertex="1" parent="1">
+          <mxGeometry x="432" y="280" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-12">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-12" value="p&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;flipH=0;" vertex="1" parent="1">
+          <mxGeometry x="432" y="350" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-25" value="标准化" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="78" y="160" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-26" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="78" y="414" width="562" height="106" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" source="uRK713DsQqLtr2tAJrWb-30" target="uRK713DsQqLtr2tAJrWb-32" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-30" value="q&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" vertex="1" parent="1">
+          <mxGeometry x="140" y="447" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" source="uRK713DsQqLtr2tAJrWb-32" target="uRK713DsQqLtr2tAJrWb-34" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-32" value="$$q’*\sigma_q+\mu_q$$" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="299" y="447" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" source="uRK713DsQqLtr2tAJrWb-34" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="467" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-34" value="风量 q" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" vertex="1" parent="1">
+          <mxGeometry x="432" y="447" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-35" value="反标准化" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="78" y="414" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-36" target="lAnI6LW0uGow_RL-pVpy-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-36" value="神经网络预测" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;flipH=0;" vertex="1" parent="1">
+          <mxGeometry x="515" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-39" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="78" y="530" width="562" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-40" value="神经网络预测" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="78" y="530" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-42">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="289" y="580" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-42" value="θ&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" vertex="1" parent="1">
+          <mxGeometry x="121" y="560" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-44">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="289" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-44" value="γ&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" vertex="1" parent="1">
+          <mxGeometry x="121" y="630" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-46">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="289" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-46" value="p&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;flipH=0;" vertex="1" parent="1">
+          <mxGeometry x="121" y="700" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-48" value="q&#39;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;" vertex="1" parent="1">
+          <mxGeometry x="472" y="630" width="103" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uRK713DsQqLtr2tAJrWb-52" target="uRK713DsQqLtr2tAJrWb-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uRK713DsQqLtr2tAJrWb-52" value="神经网络模型" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="290" y="565" width="100" height="170" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
