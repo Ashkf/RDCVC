@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-19 03:03:55
 * ----------------------------
-* Modified: 2024-02-06 23:09:16
+* Modified: 2024-03-24 20:17:42
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -237,7 +237,15 @@ class Trainer:
                 f"Resume training from checkpoint: {self.args.resume_path}"
             )
             self.logger.checkpoint = torch.load(self.args.resume_path)
-            model.load_state_dict(self.logger.checkpoint["model_state_dict"])
+            # 由于用 DataParallel 训练的模型数据并行方式的，key 中会包含”module“关键字
+            # 加载时，需要去掉”module“关键字
+            # model.load_state_dict(self.logger.checkpoint["model_state_dict"])
+            model.load_state_dict(
+                {
+                    k.replace("module.", ""): v
+                    for k, v in self.logger.checkpoint["model_state_dict"].items()
+                }
+            )
         else:
             if self.args.load_model_path != "":
                 self.logger.logger.info("pretrain 任务")
