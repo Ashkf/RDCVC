@@ -7,7 +7,7 @@
 * Soochow University
 * Created: 2023-11-19 03:04:08
 * ----------------------------
-* Modified: 2024-06-02 12:29:33
+* Modified: 2024-06-02 13:06:29
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -72,8 +72,8 @@ class DNN(nn.Module):
 
         if not width:
             raise ValueError("hidden_units is empty!!")
-        if self.depth < 2:
-            raise ValueError("hidden_units must be a list of length greater than 1")
+        if self.depth < 1:
+            raise ValueError("hidden_units must be a list of length greater than 0")
         if not all((x > 0 for x in width)):
             raise ValueError("hidden_units must be a list of positive integers")
 

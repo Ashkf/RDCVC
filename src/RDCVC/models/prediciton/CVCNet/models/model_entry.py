@@ -7,10 +7,8 @@ import torch
 import torch.nn as nn
 
 from .cvcnet import CVCNet
-from .dense import Dense
 from .IoTDamper_mlp import DAPN12
 from .kan_efficient import KANe
-from .mlp import MLP
 from .mmoe import ML_MMoE
 from .split import SplitMTL
 
@@ -25,12 +23,10 @@ from .split import SplitMTL
 # }
 
 type2model = {
-    "cvcnet-mtl-mlp": CVCNet,
-    "dense": Dense,
-    "mmoe-mtl-mlp": ML_MMoE,
-    "split-mtl": SplitMTL,
     "dapn12": DAPN12,
-    "mlp": MLP,
+    "split-mtl": SplitMTL,
+    "cvcnet-mtl-mlp": CVCNet,
+    "mmoe-mtl-mlp": ML_MMoE,
     "kane": KANe,
 }
 
@@ -41,6 +37,15 @@ def select_model(model_type: str):
     _model_name = _type[0]
 
     match _model_name:
+        case "dapn12":
+            return DAPN12()
+        case "split-mtl":
+            # e.g.: split-mtl_18-32-32_leakyrelu
+            return SplitMTL(
+                width=[int(v) for v in _type[1].split("-")],
+                target_dict={"Airflow": 4, "Pres": 6},
+                activation=_type[2],
+            )
         case "cvcnet-mtl-mlp":
             # e.g.: cvcnet-mtl-mlp_18_2_5_9_64-64-64_32-32-32
             return CVCNet(
@@ -52,21 +57,8 @@ def select_model(model_type: str):
                 expert_units=[int(v) for v in (_type[5]).split("-")],
                 tower_units=[int(v) for v in _type[6].split("-")],
             )
-        case "mlp":
-            return MLP(
-                width=[int(v) for v in _type[1].split("-")],
-                activation_fn=_type[2],
-            )
-        case "dapn12":
-            return DAPN12()
         case "stl-mlp":
             return
-        case "split-mtl":
-            return SplitMTL(
-                inputs_dim=int(_type[1]),
-                target_dict={"Airflow": 4, "Pres": 6},
-                bottom_units=[int(v) for v in _type[2].split(":")],
-            )
         case "kane":
             # e.g.: kane_1-1-1
             return KANe(layers_hidden=[int(v) for v in _type[1].split("-")])

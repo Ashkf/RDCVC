@@ -146,11 +146,11 @@ class MetricsComputer:
     def comp_metrics(self, pred, target, is_train: bool) -> dict:
         _model_name = self.model_type.split("_")[0]
         match _model_name:
-            case "cvcnet-mtl-mlp", "split-mtl":
+            case "cvcnet-mtl-mlp" | "split-mtl":
                 _metrics = self._comp_metrices_byTasksType(
                     pred, target, is_train=is_train
                 )
-            case "mlp", "dapn12", "kane":
+            case "mlp" | "dapn12" | "kane":
                 _metrics = self._comp_metrics_IoTDamper(pred, target, is_train=is_train)
             case _:
                 raise ValueError(f"Unknown model type: {self.model_type}")
