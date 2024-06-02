@@ -179,6 +179,11 @@
 				"notebook.stickyScroll.enabled": true,
 				"notebook.lineNumbers": "on",
 				"notebook.diff.overviewRuler": true,
+				"notebook.formatOnSave.enabled": true, // notebook 保存时自动格式化
+				"notebook.codeActionsOnSave": {
+					"source.fixAll": true, // notebook 保存时自动修复可修复的 lint 错误
+					"source.organizeImports": true // notebook 保存时自动排序 import 语句
+				},
 				"black-formatter.showNotifications": "always",
 				"editor.stickyScroll.enabled": true,
 				"svg.preview.mode": "svg",
