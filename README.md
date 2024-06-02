@@ -22,8 +22,7 @@ Learning, and Multi-Objective Optimization using Neural Networks and Optimizatio
 |   --save_prefix   |               'pref'                | 训练时：实验的名字，可以备注自己改了那些重要组件，具体的参数，会用于创建保存模型的目录；测试时：测试的名字，可以备注测试时做了哪些配置，会用于创建保存测试结果的目录 |
 | --load_model_path | 'checkpoints/base_model_pref/0.pth' | 模型加载路径，训练时，作为预训练模型路径，测试时，作为待测模型路径，                                                                                                 |
 | --load_not_strict |                                     | 'allow to load only common state dicts'                                                                                                                              |
-|    --val_list     | '/data/dataset1/list/base/val.txt'  | 训练时可以传入验证集 path，测试时可以传入测试集 path                                                                                                                 |
-|      --gpus       |                                     |                                                                                                                                                                      |
+|    --val_list     | '/data/dataset1/list/base/val.txt'  | 训练时可以传入验证集 path，测试时可以传入测试集 path                                                                                                                 |  |
 
 #### TRAIN
 
@@ -123,10 +122,36 @@ DOPNN/
 
 ## 模型
 
+### dapn12
+
+写死的一个 mlp 模型。
+
+### split-mtl
+
+model_type:
+
+```
+split-mtl_<layer_widths>_<optimizer>
+```
+
+例如：一个深度为 3，输入特征数为 10，输出特征数为 2，两层隐藏层宽度分别为 64 和 32，优化器为 adam 的模型，model_type 为：`split-mtl_10:64:32:2_adam`。
+
+该模型本质为一个 MLP 组成共享底层，然后每类任务有一个独立的输出层。
+
+### dense-mtl
+
+model_type:
+
+```
+dense-mtl_<layer_widths>_<optimizer>
+```
+
+结构同 split-mtl 一样，区别在于针对每个特征均产生一个输出。
+
 ### CVCNet
 
 model_type:
 
 ```
-cvcnet-mtl-mlp_<inputs_dim>_<num_layers>_<num_tasks_experts>_<num_shared_experts>_<expert_units, 32:32>_<tower_units, 32:32>
+cvcnet-mtl-mlp_<inputs_dim>_<num_layers>_<num_tasks_experts>_<num_shared_experts>_<expert_units, 32-32>_<tower_units, 32-32>
 ```

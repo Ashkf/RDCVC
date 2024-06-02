@@ -18,7 +18,7 @@
 * Soochow University
 * Created: 2024-02-06 18:22:34
 * ----------------------------
-* Modified: 2024-02-09 01:22:40
+* Modified: 2024-06-02 13:32:03
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -51,9 +51,6 @@ def _set_common_args(parser):
                     这样我们就可以修改模型的某个组件，然后用之前的模型来做预训练啦！
                     如果关闭，就会用 torch 原本加载的逻辑，要求比较严格的参数匹配；
     eval_path: 训练时可以传入验证集 path，测试时可以传入测试集 path；
-    gpus：可以配置训练或测试时使用的显卡编号，在多卡训练时需要用到，
-        测试时也可以指定显卡编号，绕开其他正在用的显卡，
-        当然你也可以在命令行里 export CUDA_VISIBLE_DEVICES 这个环境变量来控制
     """
 
     parser.add_argument(
@@ -87,7 +84,6 @@ def _set_common_args(parser):
         default="cuda",
         help="device: cuda or cpu. default: cuda",
     )
-    parser.add_argument("--gpus", nargs="+", type=int, default=[0])
     parser.add_argument("--seed", type=int, default=None)
     return parser
 
@@ -350,28 +346,11 @@ def prepare_train_args():
     _args.model_dir = _build_train_model_dir(_args)
 
     # device
-    _args.device = _process_device(_args.device, _args.gpus)
+    _args.device = "cpu" if _args.device == "cpu" else "cuda"
 
     _save_args(_args, _args.model_dir)
 
     return _args
-
-
-def _process_device(device, gpus):
-    """Process the device information.
-
-    Args:
-        device (str): The device to be used, either "cpu" or "cuda".
-        gpus (int): The index of GPUs to be used.
-
-    Returns:
-        list: A list containing the device information.
-    """
-    if device == "cpu":
-        device_info = ["cpu"]
-    elif device == "cuda":
-        device_info = ["cuda"] + [gpus]
-    return device_info
 
 
 def _check_args(_args):
@@ -391,6 +370,8 @@ def _check_args(_args):
             _args.num_tasks = 2
         elif "split" in _args.model_type.split("_")[0]:
             _args.num_tasks = 2
+        elif "dense" in _args.model_type.split("_")[0]:
+            _args.num_tasks = 10
     if (
         _args.normalize_method != "no_normalize_method"
         and _args.normalize_target == "none"
@@ -433,10 +414,6 @@ def _check_args(_args):
         raise ValueError("lr_scheduler factor 必须 > 0。")
     if _args.lrsmin <= 0:
         raise ValueError("lr_scheduler min_lr 必须 > 0。")
-    if _args.device == "cpu" and len(_args.gpus) > 1:
-        raise ValueError("CPU 模式下，不可使用多卡。")
-    if _args.device == "cuda" and len(_args.gpus) == 0:
-        raise ValueError("CUDA 模式下，必须使用至少一块显卡。")
 
 
 def prepare_test_args():

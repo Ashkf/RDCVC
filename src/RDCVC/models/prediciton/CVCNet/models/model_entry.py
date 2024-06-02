@@ -3,73 +3,78 @@
 import 自己的模型到 model_entry 的字典中
 """
 
-from typing import List, Union
-
 import torch
 import torch.nn as nn
 
+from .base_mtl import BaseMTL
 from .cvcnet import CVCNet
 from .IoTDamper_mlp import DAPN12
-from .mlp import MLP
-
-# from .dense import Dense
-# from .mmoe import ML_MMoE
-# from .split import SplitMTL
-# from .submodules import DNN
-
-# # todo: 迁移至 README.md
-# type2help = {
-#     "split-mtl": (
-#         "仅在输出层进行多任务划分的模型。Bottom 块为 DNN，输出层为 DNN。"
-#         "split-mtl_<inputs_dim>_<bottom_units, 32:32>_"
-#     ),
-# }
+from .kan_efficient import KANe
 
 type2model = {
-    "cvcnet-mtl-mlp": CVCNet,
-    # "dense": Dense,
-    # "mmoe-mtl-mlp": ML_MMoE,
-    # "dnn": DNN,
-    # "split-mtl": SplitMTL,
     "dapn12": DAPN12,
-    "mlp": MLP,
+    "split-mtl": BaseMTL,
+    "dense-mtl": BaseMTL,
+    "cvcnet-mtl-mlp": CVCNet,
+    "kane": KANe,
 }
 
 
 def select_model(model_type: str):
     """入口，选择模型结构"""
     _type = model_type.split("_")
+    _model_name = _type[0]
 
-    if _type[0] == "cvcnet-mtl-mlp":  # 标准的 CVCNet 模型
-        # cvcnet-mtl-mlp_18_2_5_9_64-64-64_32-32-32
-        return type2model[_type[0]](
-            inputs_dim=int(_type[1]),
-            target_dict={"Airflow": 4, "Pres": 6},
-            num_layers=int(_type[2]),
-            num_tasks_experts=int(_type[3]),
-            num_shared_experts=int(_type[4]),
-            expert_units=[int(v) for v in (_type[5]).split("-")],
-            tower_units=[int(v) for v in _type[6].split("-")],
-        )
-    elif _type[0] == "mlp":
-        return type2model[_type[0]](
-            width=[int(v) for v in _type[1].split("-")],
-            activation_fn=_type[2],
-        )
-    elif _type[0] == "dapn12":
-        return type2model[_type[0]]()
-    elif _type[0] == "stl-mlp":
-        return
-    elif _type[0] == "split-mtl":
-        return type2model[_type[0]](
-            inputs_dim=int(_type[1]),
-            target_dict={"Airflow": 4, "Pres": 6},
-            bottom_units=[int(v) for v in _type[2].split(":")],
-        )
-    else:
-        raise ValueError(
-            f"模型类型 {model_type} 不存在，请检查输入的模型类型是否正确。"
-        )
+    match _model_name:
+        case "dapn12":
+            return DAPN12()
+        case "split-mtl":
+            # e.g.: split-mtl_18-32-32_leakyrelu
+            return BaseMTL(
+                bottom_width=[int(v) for v in _type[1].split("-")],
+                tower_width=[],
+                target_dict={"Airflow": 4, "Pres": 6},
+                activation=_type[2],
+            )
+        case "dense-mtl":
+            # e.g.: dense-mtl_18-32-32_leakyrelu
+            return BaseMTL(
+                bottom_width=[int(v) for v in _type[1].split("-")],
+                tower_width=[],
+                target_dict={
+                    "TOT_FRSH_VOL": 1,
+                    "TOT_SUPP_VOL": 1,
+                    "TOT_EXH_VOL": 1,
+                    "TOT_RET_VOL": 1,
+                    "RM1_PRES": 1,  # a
+                    "RM2_PRES": 1,  # b
+                    "RM3_PRES": 1,  # d
+                    "RM4_PRES": 1,  # e
+                    "RM5_PRES": 1,  # f
+                    "RM6_PRES": 1,  # c
+                },
+                activation=_type[2],
+            )
+        case "cvcnet-mtl-mlp":
+            # e.g.: cvcnet-mtl-mlp_18_2_5_9_64-64-64_32-32-32
+            return CVCNet(
+                inputs_dim=int(_type[1]),
+                target_dict={"Airflow": 4, "Pres": 6},
+                num_layers=int(_type[2]),
+                num_tasks_experts=int(_type[3]),
+                num_shared_experts=int(_type[4]),
+                expert_units=[int(v) for v in (_type[5]).split("-")],
+                tower_units=[int(v) for v in _type[6].split("-")],
+            )
+        case "stl-mlp":
+            return
+        case "kane":
+            # e.g.: kane_1-1-1
+            return KANe(layers_hidden=[int(v) for v in _type[1].split("-")])
+        case default:
+            raise ValueError(
+                f"模型类型 {default} 不存在，请检查输入的模型类型是否正确。"
+            )
 
 
 def init_model(model, args, logger):
@@ -114,14 +119,12 @@ def _init_model_kaiming(model):
     return model
 
 
-def equip_device(model: torch.nn.Module, device: List[Union[str, int]]):
+def equip_device(model: torch.nn.Module, device: str):
     """Equip the model with the specified device for processing.
 
     Args:
         model (torch.nn.Module): The model to be equipped with the device.
-        device (List[str, List[int]]): The device to be used for processing.
-            The first element of the list should be either 'cpu' or 'cuda'.
-            If 'cuda' is chosen, the second element should be a list of GPU device IDs.
+        device (str): The device to be used for processing.
 
     Returns:
         torch.nn.Module: The model equipped with the specified device.
@@ -130,12 +133,11 @@ def equip_device(model: torch.nn.Module, device: List[Union[str, int]]):
         RuntimeError: If CUDA is not available when 'cuda' is chosen as the device.
         ValueError: If an invalid device type is provided. Supported types are 'cpu' and 'cuda'.
     """
-    if device[0] == "cpu":
+    if device == "cpu":
         model = model.to("cpu")  # CPU processing
-    elif device[0] == "cuda":
+    elif device == "cuda":
         if torch.cuda.is_available():
-            # Multi-GPU parallel processing
-            model = torch.nn.DataParallel(model, device_ids=device[1]).to("cuda")
+            model = model.to("cuda")
         else:
             raise RuntimeError("CUDA is not available.")
     else:

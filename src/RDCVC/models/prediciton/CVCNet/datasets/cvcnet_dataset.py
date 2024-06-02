@@ -1,12 +1,12 @@
 """
 * dataset for CVCNet
 *
-* File: bim_cpn_dataset.py
+* File: cvcnet_dataset.py
 * Author: Fan Kai
 * Soochow University
 * Created: 2023-11-19 03:04:13
 * ----------------------------
-* Modified: 2024-03-09 21:32:50
+* Modified: 2024-06-01 15:29:06
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -22,7 +22,7 @@ from torch.utils.data import dataset
 
 
 class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 dataset
-    def __init__(self, args, is_train=True, scaler=None):
+    def __init__(self, args, is_train=True, scaler=None, device=None):
         """
             一般用来 train 的预处理和 test 的预处理是不同的，需要区分二者的参数。
 
@@ -34,9 +34,9 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         super().__init__()
         self.scaler = scaler
         self.is_train = is_train  # 是否是训练集
+        self.device = device
         self.normalize_target = args.normalize_target  # 归一化的目标
         self.normalize_method = args.normalize_method  # 归一化的方法
-        self.device = args.device[0]
         self.target_key = [
             "TOT_FRSH_VOL",
             "TOT_SUPP_VOL",
@@ -115,7 +115,7 @@ class CVCNetDataset(dataset.Dataset):  # 注意父类的名称，不能写 datas
         _target = torch.tensor(_target.values, dtype=torch.float32).to(self.device)
 
         # ----------------------- normalize ---------------------- #
-        _data = self.scaler.scale(_data, "x", self.is_train)
-        _target = self.scaler.scale(_target, "y", self.is_train)
+        _data: Tensor = self.scaler.scale(_data, "x", self.is_train)
+        _target: Tensor = self.scaler.scale(_target, "y", self.is_train)
 
-        return {"data": _data, "target": _target}
+        return {"data": _data.to(self.device), "target": _target.to(self.device)}

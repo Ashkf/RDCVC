@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-11-26 02:48:55
 * ----------------------------
-* Modified: 2024-01-29 17:20:57
+* Modified: 2024-06-02 14:46:57
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -22,16 +22,14 @@ from .submodules import DNN
 class Expert(torch.nn.Module):
     def __init__(
         self,
-        inputs_dim: int,
-        hiden_units: List[int],
-        activation: Optional[str] = "leakyrelu:0.1",
+        width: List[int],
+        activation: Optional[str] = "leakyrelu",
         dropout_rate: Optional[float] = None,
         use_bn: bool = False,
     ):
         super().__init__()
         self.kernel = DNN(
-            inputs_dim,
-            hiden_units,
+            width,
             activation=activation,
             dropout_rate=dropout_rate,
             use_bn=use_bn,
@@ -45,16 +43,14 @@ class Expert(torch.nn.Module):
 class Tower(torch.nn.Module):
     def __init__(
         self,
-        inputs_dim: int,
-        hiden_units: List[int],
-        activation: Optional[str] = "leakyrelu:0.1",
+        width: List[int],
+        activation: Optional[str] = "leakyrelu",
         dropout_rate: Optional[float] = None,
         use_bn: bool = False,
     ):
         super().__init__()
         self.kernel = DNN(
-            inputs_dim,
-            hiden_units,
+            width,
             activation=activation,
             dropout_rate=dropout_rate,
             use_bn=use_bn,
@@ -121,8 +117,7 @@ class ExtractionNet(torch.nn.Module):
         self.shared_experts = torch.nn.ModuleList(
             [
                 Expert(
-                    inputs_dim,
-                    expert_units,
+                    [inputs_dim] + expert_units,
                     expert_activation,
                     expert_dropout_rate,
                     expert_use_bn,
@@ -130,42 +125,40 @@ class ExtractionNet(torch.nn.Module):
                 for _ in range(num_shared_experts)
             ]
         )
-        self.SA_experts = torch.nn.ModuleList(
-            [
-                Expert(
-                    inputs_dim,
-                    expert_units,
-                    expert_activation,
-                    expert_dropout_rate,
-                    expert_use_bn,
-                )
-                for _ in range(num_tasks_experts)
-            ]
-        )
-        self.RA_experts = torch.nn.ModuleList(
-            [
-                Expert(
-                    inputs_dim,
-                    expert_units,
-                    expert_activation,
-                    expert_dropout_rate,
-                    expert_use_bn,
-                )
-                for _ in range(num_tasks_experts)
-            ]
-        )
-        self.EA_experts = torch.nn.ModuleList(
-            [
-                Expert(
-                    inputs_dim,
-                    expert_units,
-                    expert_activation,
-                    expert_dropout_rate,
-                    expert_use_bn,
-                )
-                for _ in range(num_tasks_experts)
-            ]
-        )
+
+        def create_experts(
+            width,
+            expert_activation,
+            expert_dropout_rate,
+            expert_use_bn,
+            num_tasks_experts,
+        ):
+            return torch.nn.ModuleList(
+                [
+                    Expert(
+                        width,
+                        expert_activation,
+                        expert_dropout_rate,
+                        expert_use_bn,
+                    )
+                    for _ in range(num_tasks_experts)
+                ]
+            )
+
+        _experts = {
+            f"{name}_experts": create_experts(
+                [inputs_dim] + expert_units,
+                expert_activation,
+                expert_dropout_rate,
+                expert_use_bn,
+                num_tasks_experts,
+            )
+            for name in ["SA", "RA", "EA"]
+        }
+
+        self.SA_experts = _experts["SA_experts"]
+        self.RA_experts = _experts["RA_experts"]
+        self.EA_experts = _experts["EA_experts"]
 
         # ------------------------- Gates ------------------------ #
         # per gate:
@@ -174,27 +167,24 @@ class ExtractionNet(torch.nn.Module):
         #   output: y, represents, (batch_size, num_experts)
         # num of gates: 4, shared, SA, RA, EA
         self.shared_gate = DNN(
-            inputs_dim,
-            [num_shared_experts + num_tasks_experts * (self.num_gates - 1)],
-            activation="softmax:1",
+            [inputs_dim]
+            + [num_shared_experts + num_tasks_experts * (self.num_gates - 1)],
+            activation="softmax",
         )
 
         self.SA_gate = DNN(
-            inputs_dim,
-            [num_tasks_experts + num_shared_experts],
-            activation="softmax:1",
+            [inputs_dim] + [num_tasks_experts + num_shared_experts],
+            activation="softmax",
         )
 
         self.RA_gate = DNN(
-            inputs_dim,
-            [num_tasks_experts + num_shared_experts],
-            activation="softmax:1",
+            [inputs_dim] + [num_tasks_experts + num_shared_experts],
+            activation="softmax",
         )
 
         self.EA_gate = DNN(
-            inputs_dim,
-            [num_tasks_experts + num_shared_experts],
-            activation="softmax:1",
+            [inputs_dim] + [num_tasks_experts + num_shared_experts],
+            activation="softmax",
         )
 
         if self.is_last_layer:
@@ -205,8 +195,7 @@ class ExtractionNet(torch.nn.Module):
             self.towers = torch.nn.ModuleList(
                 [
                     Tower(
-                        expert_units[-1] * self.num_gates,
-                        tower_units,
+                        [expert_units[-1] * self.num_gates] + tower_units,
                         tower_activation,
                         tower_dropout_rate,
                         tower_use_bn,
@@ -317,11 +306,11 @@ class CVCNet(torch.nn.Module):
         num_tasks_experts: int,
         num_shared_experts: int,
         expert_units: List[int],
-        expert_activation: str = "leakyrelu:0.1",
+        expert_activation: str = "leakyrelu",
         expert_dropout_rate: Optional[float] = None,
         expert_use_bn: bool = False,
         tower_units: List[int] = None,
-        tower_activation: Optional[str] = "leakyrelu:0.1",
+        tower_activation: Optional[str] = "leakyrelu",
         tower_dropout_rate: Optional[float] = None,
         tower_use_bn: Optional[bool] = None,
     ):
