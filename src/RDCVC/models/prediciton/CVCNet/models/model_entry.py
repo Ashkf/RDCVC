@@ -6,28 +6,16 @@ import 自己的模型到 model_entry 的字典中
 import torch
 import torch.nn as nn
 
+from .base_mtl import BaseMTL
 from .cvcnet import CVCNet
 from .IoTDamper_mlp import DAPN12
 from .kan_efficient import KANe
-from .mmoe import ML_MMoE
-from .split import SplitMTL
-
-# from .submodules import DNN
-
-# # todo: 迁移至 README.md
-# type2help = {
-#     "split-mtl": (
-#         "仅在输出层进行多任务划分的模型。Bottom 块为 DNN，输出层为 DNN。"
-#         "split-mtl_<inputs_dim>_<bottom_units, 32:32>_"
-#     ),
-# }
 
 type2model = {
     "dapn12": DAPN12,
-    "split-mtl": SplitMTL,
-    "dense-mtl": SplitMTL,
+    "split-mtl": BaseMTL,
+    "dense-mtl": BaseMTL,
     "cvcnet-mtl-mlp": CVCNet,
-    "mmoe-mtl-mlp": ML_MMoE,
     "kane": KANe,
 }
 
@@ -42,15 +30,17 @@ def select_model(model_type: str):
             return DAPN12()
         case "split-mtl":
             # e.g.: split-mtl_18-32-32_leakyrelu
-            return SplitMTL(
-                width=[int(v) for v in _type[1].split("-")],
+            return BaseMTL(
+                bottom_width=[int(v) for v in _type[1].split("-")],
+                tower_width=[],
                 target_dict={"Airflow": 4, "Pres": 6},
                 activation=_type[2],
             )
         case "dense-mtl":
             # e.g.: dense-mtl_18-32-32_leakyrelu
-            return SplitMTL(
-                width=[int(v) for v in _type[1].split("-")],
+            return BaseMTL(
+                bottom_width=[int(v) for v in _type[1].split("-")],
+                tower_width=[],
                 target_dict={
                     "TOT_FRSH_VOL": 1,
                     "TOT_SUPP_VOL": 1,
