@@ -25,6 +25,7 @@ from .split import SplitMTL
 type2model = {
     "dapn12": DAPN12,
     "split-mtl": SplitMTL,
+    "dense-mtl": SplitMTL,
     "cvcnet-mtl-mlp": CVCNet,
     "mmoe-mtl-mlp": ML_MMoE,
     "kane": KANe,
@@ -44,6 +45,24 @@ def select_model(model_type: str):
             return SplitMTL(
                 width=[int(v) for v in _type[1].split("-")],
                 target_dict={"Airflow": 4, "Pres": 6},
+                activation=_type[2],
+            )
+        case "dense-mtl":
+            # e.g.: dense-mtl_18-32-32_leakyrelu
+            return SplitMTL(
+                width=[int(v) for v in _type[1].split("-")],
+                target_dict={
+                    "TOT_FRSH_VOL": 1,
+                    "TOT_SUPP_VOL": 1,
+                    "TOT_EXH_VOL": 1,
+                    "TOT_RET_VOL": 1,
+                    "RM1_PRES": 1,  # a
+                    "RM2_PRES": 1,  # b
+                    "RM3_PRES": 1,  # d
+                    "RM4_PRES": 1,  # e
+                    "RM5_PRES": 1,  # f
+                    "RM6_PRES": 1,  # c
+                },
                 activation=_type[2],
             )
         case "cvcnet-mtl-mlp":

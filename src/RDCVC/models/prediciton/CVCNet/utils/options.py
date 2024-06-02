@@ -18,7 +18,7 @@
 * Soochow University
 * Created: 2024-02-06 18:22:34
 * ----------------------------
-* Modified: 2024-06-01 15:47:33
+* Modified: 2024-06-02 13:32:03
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -370,6 +370,8 @@ def _check_args(_args):
             _args.num_tasks = 2
         elif "split" in _args.model_type.split("_")[0]:
             _args.num_tasks = 2
+        elif "dense" in _args.model_type.split("_")[0]:
+            _args.num_tasks = 10
     if (
         _args.normalize_method != "no_normalize_method"
         and _args.normalize_target == "none"

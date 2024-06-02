@@ -150,6 +150,8 @@ class MetricsComputer:
                 _metrics = self._comp_metrices_byTasksType(
                     pred, target, is_train=is_train
                 )
+            case "dense-mtl":
+                _metrics = self._comp_metrics_byTarget(pred, target, is_train=is_train)
             case "mlp" | "dapn12" | "kane":
                 _metrics = self._comp_metrics_IoTDamper(pred, target, is_train=is_train)
             case _:
@@ -331,8 +333,6 @@ class MetricsComputer:
         _losses = self._calc_loss_l2(pred, target)
 
         # ---------------------- 反归一化 (若对标签采取归一化) ----------------------
-        # !!! 会破坏 tensor 的计算图
-        # !!! scale 内部会进行 x.numpy() 操作，会破坏 tensor 的计算图
         _pred = self.scaler.scale(
             pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
         ).to("cpu")
@@ -342,7 +342,7 @@ class MetricsComputer:
 
         # ------------------------ metrics ----------------------- #
         prefix = "train/" if is_train else "val/"  # 前缀，用于区分训练和验证
-        metrics = {
+        return {
             prefix + "loss_tot_fv": _losses[0],
             prefix + "loss_tot_sv": _losses[1],
             prefix + "loss_tot_ev": _losses[2],
@@ -364,7 +364,6 @@ class MetricsComputer:
             prefix + "mape_rm_pres": self._calc_mape(_pred[:, 4:10], _target[:, 4:10]),
             prefix + "rmse_rm_pres": self._calc_rmse(_pred[:, 4:10], _target[:, 4:10]),
         }
-        return metrics
 
     def _use_loss_weight(self, _loss: List[Tensor]) -> Tensor:
         """Use loss weight to compute loss."""
