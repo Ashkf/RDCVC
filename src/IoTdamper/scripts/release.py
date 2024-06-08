@@ -1,26 +1,30 @@
 """
-* 
-* 
+* 该脚本用于模型的发布。
+* 包括模型的加载、测试、转换为 ONNX 模型、测试 ONNX 模型、
+* 准备使用案例、保存使用案例、保存标准化器参数等
+*
 * File: release.py
 * Author: Fan Kai
 * Soochow University
 * Created: 2023-10-09 11:00:54
 * ----------------------------
-* Modified: 2023-11-02 10:05:32
+* Modified: 2024-06-08 10:44:55
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
 """
 
-
-import torch
 import os
 import pickle
-import yaml
-import numpy as np
-import onnxruntime
-import onnx
+import sys
 
+import numpy as np
+import onnx
+import onnxruntime
+import torch
+import yaml
+
+sys.path.append("/workspace/src")
 # -------------------------------------------------------- #
 #                        load model                        #
 # -------------------------------------------------------- #
@@ -37,13 +41,25 @@ print("> start loading model...", end="")
 
 
 # 2. 从 final model 中加载模型（by 完整模型）
-ckp_dir = r"checkpoints/NN/V5_320250_2023-11-01T09-21-54"
+ckp_dir = (
+    r"/workspace/src/IoTdamper/ckps/dapn12_BS8_LR0.001_EP10000_2023-10-09T10-36-49"
+)
 
 path_release = os.path.join(ckp_dir, "release")
 path_onnx = os.path.join(path_release, "final_model.onnx")
 os.makedirs(path_release, exist_ok=True)
 
-model_torch = torch.load(os.path.join(ckp_dir, "final_model.pth"))
+
+# --------------- load model by state_dict --------------- #
+from src.RDCVC.models.prediciton.CVCNet.models.IoTDamper_mlp import DAPN12
+
+model_torch = DAPN12()
+model_torch.load_state_dict(
+    torch.load(os.path.join(ckp_dir, "ckps/ckp_E0174-B0000.pth"))["model_state_dict"]
+)
+
+# --------------- load model by full model --------------- #
+# model_torch = torch.load(os.path.join(ckp_dir, "final_model.pth"))
 print("done.")
 # -------------------------------------------------------- #
 #                        test model                        #
@@ -71,6 +87,17 @@ def convert_onnx(model, onnx_path):
     input_shape = 3  # 输入数据长度
     dummy_input = torch.randn(batch_size, input_shape, requires_grad=False)  # 生成张量
     export_onnx_file = onnx_path  # 目的 ONNX 文件名
+
+    # # ------------ remove nn.DataParallel wrapper ------------ #
+    # state_dict = model.state_dict()
+    # new_state_dict = OrderedDict()
+    # for k, v in state_dict.items():
+    #     if k[:7] == "module.":
+    #         name = k[7:]  # remove "module."
+    #         new_state_dict[name] = v
+    # model.load_state_dict(new_state_dict)
+    # model.eval()
+
     torch.onnx.export(
         model,  # 待转换模型
         dummy_input,  # 输入张量
