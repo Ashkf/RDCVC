@@ -8,7 +8,7 @@
 * Soochow University
 * Created: 2023-10-09 11:00:54
 * ----------------------------
-* Modified: 2024-06-08 10:44:55
+* Modified: 2024-06-08 16:38:30
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -41,9 +41,8 @@ print("> start loading model...", end="")
 
 
 # 2. 从 final model 中加载模型（by 完整模型）
-ckp_dir = (
-    r"/workspace/src/IoTdamper/ckps/dapn12_BS8_LR0.001_EP10000_2023-10-09T10-36-49"
-)
+ckp_dir = r"/workspace/src/IoTdamper/ckps/dapn12_BS8_LR0.001_EP10000_2023-10-09T10-36-49"
+
 
 path_release = os.path.join(ckp_dir, "release")
 path_onnx = os.path.join(path_release, "final_model.onnx")
@@ -54,10 +53,7 @@ os.makedirs(path_release, exist_ok=True)
 from src.RDCVC.models.prediciton.CVCNet.models.IoTDamper_mlp import DAPN12
 
 model_torch = DAPN12()
-model_torch.load_state_dict(
-    torch.load(os.path.join(ckp_dir, "ckps/ckp_E0174-B0000.pth"))["model_state_dict"]
-)
-
+model_torch.load_state_dict(torch.load(os.path.join(ckp_dir, "ckps/ckp_E0174-B0000.pth"))["model_state_dict"])
 # --------------- load model by full model --------------- #
 # model_torch = torch.load(os.path.join(ckp_dir, "final_model.pth"))
 print("done.")
@@ -85,7 +81,7 @@ def convert_onnx(model, onnx_path):
     model.eval()  # 设置为评估模式
     batch_size = 1  # 批处理大小
     input_shape = 3  # 输入数据长度
-    dummy_input = torch.randn(batch_size, input_shape, requires_grad=False)  # 生成张量
+    dummy_input = torch.randn(batch_size, input_shape, requires_grad=False).to(next(model.parameters()).device)
     export_onnx_file = onnx_path  # 目的 ONNX 文件名
 
     # # ------------ remove nn.DataParallel wrapper ------------ #
@@ -99,7 +95,7 @@ def convert_onnx(model, onnx_path):
     # model.eval()
 
     torch.onnx.export(
-        model,  # 待转换模型
+        model.module if model.__class__.__name__ == "DataParallel" else model,  # 待转换模型
         dummy_input,  # 输入张量
         export_onnx_file,  # 目的 ONNX 文件名
         opset_version=10,  # ONNX 版本
@@ -144,7 +140,7 @@ ort_output = ort_session.run(None, ort_inputs)[0]
 print("onnx model inference test:\n" + "-" * 20)
 print(f"onnx_in: {ort_inputs}, onnx_out: {ort_output}")
 
-if np.allclose(_dummy_torch_out.detach().numpy(), ort_output, rtol=1e-03, atol=1e-05):
+if np.allclose(_dummy_torch_out.detach().cpu().numpy(), ort_output, rtol=1e-03, atol=1e-05):
     print("Torch model and onnx model outputs are consistent.")
 print("> test done.")
 # -------------------------------------------------------- #
@@ -167,27 +163,56 @@ scaler_y.mean_ = np.array([0])
 scaler_y.scale_ = np.array([1])
 scaler_y.var_ = np.array([1])
 
-rls_input = np.array([[75, 90, 36]]).astype(np.float32)
-rls_onnx_input = {"modelInput": scaler_x.transform(rls_input)}
-rls_onnx_output = ort_session.run(None, rls_onnx_input)
-rls_output = scaler_y.inverse_transform(rls_onnx_output[0].reshape(-1, 1))
 
-print("use case\n" + "-" * 20)
-print(f"输入数据：{rls_input}")
-print(f"ONNX 输入：{rls_onnx_input}")
-print(f"ONNX 输出：{rls_onnx_output}")
-print(f"输出数据：{rls_output}")
+def save_usecase(usecase_input: list[int], usecase_path: str):
+    usecase_input = np.array([usecase_input]).astype(np.float32)
+    usecase_input.astype(np.float32)
+    usecase_onnx_input = {
+        "modelInput": scaler_x.transform(usecase_input)
+        if isinstance(usecase_input, np.ndarray)
+        else scaler_x.transform(usecase_input.numpy())
+    }
+    usecase_onnx_output = ort_session.run(None, usecase_onnx_input)
+    usecase_output = scaler_y.inverse_transform(usecase_onnx_output[0].reshape(-1, 1))
+
+    with open(usecase_path, "a") as f:
+        f.write("\n")
+        f.write("use case\n" + "-" * 20 + "\n")
+        f.write(f"输入数据：{usecase_input}\n")
+        f.write(f"ONNX 输入：{usecase_onnx_input}\n")
+        f.write(f"ONNX 输出：{usecase_onnx_output}\n")
+        f.write(f"输出数据：{usecase_output}\n")
+
+
+# rls_input = np.array([[11, 33, 88]]).astype(np.float32)
+
+# rls_onnx_input = {"modelInput": scaler_x.transform(rls_input).numpy()}
+# rls_onnx_output = ort_session.run(None, rls_onnx_input)
+# rls_output = scaler_y.inverse_transform(rls_onnx_output[0].reshape(-1, 1))
+
+# print("use case\n" + "-" * 20)
+# print(f"输入数据：{rls_input}")
+# print(f"ONNX 输入：{rls_onnx_input}")
+# print(f"ONNX 输出：{rls_onnx_output}")
+# print(f"输出数据：{rls_output}")
 
 # --------------------- save usecase --------------------- #
 print(">> save use case...", end="")
 usecase_path = os.path.join(path_release, "usecase.txt")
-with open(usecase_path, "w") as f:
-    f.write("onnx test case\n")
-    f.write("--------------------\n")
-    f.write(f"input: {rls_input}\n")
-    f.write(f"onnx_input: {rls_onnx_input}\n")
-    f.write(f"onnx_output: {rls_onnx_output}\n")
-    f.write(f"output: {ort_output}\n")
+
+save_usecase([90, 41, 31], usecase_path)
+save_usecase([68, 46, 83], usecase_path)
+save_usecase([19, 45, 80], usecase_path)
+save_usecase([1, 64, 58], usecase_path)
+save_usecase([16, 0, 2], usecase_path)
+
+# with open(usecase_path, "w") as f:
+#     f.write("onnx test case\n")
+#     f.write("--------------------\n")
+#     f.write(f"input: {rls_input}\n")
+#     f.write(f"onnx_input: {rls_onnx_input}\n")
+#     f.write(f"onnx_output: {rls_onnx_output}\n")
+#     f.write(f"output: {ort_output}\n")
 print("done.")
 
 # --------------------- save scaler ---------------------- #
