@@ -8,7 +8,7 @@
 * Soochow University
 * Created: 2023-10-09 11:00:54
 * ----------------------------
-* Modified: 2024-06-08 16:38:30
+* Modified: 2024-06-27 16:17:20
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -41,7 +41,7 @@ print("> start loading model...", end="")
 
 
 # 2. 从 final model 中加载模型（by 完整模型）
-ckp_dir = r"/workspace/src/IoTdamper/ckps/dapn12_BS8_LR0.001_EP10000_2023-10-09T10-36-49"
+ckp_dir = r"/workspace/checkpoints/NN/mlp_3-200-200-200-1_relu_BS2_LR0.001_EP1000_2024-05-31T16-56-40"
 
 
 path_release = os.path.join(ckp_dir, "release")
@@ -50,12 +50,14 @@ os.makedirs(path_release, exist_ok=True)
 
 
 # --------------- load model by state_dict --------------- #
-from src.RDCVC.models.prediciton.CVCNet.models.IoTDamper_mlp import DAPN12
+# from src.RDCVC.models.prediciton.CVCNet.models.mlp import MLP
 
-model_torch = DAPN12()
-model_torch.load_state_dict(torch.load(os.path.join(ckp_dir, "ckps/ckp_E0174-B0000.pth"))["model_state_dict"])
+# model_torch = MLP(width=[3, 200, 200, 1], activation_fn="relu")
+# model_torch.load_state_dict(
+#     torch.load(os.path.join(ckp_dir, "ckps/ckp_E0064-B0000.pth"))["model_state_dict"]
+# )
 # --------------- load model by full model --------------- #
-# model_torch = torch.load(os.path.join(ckp_dir, "final_model.pth"))
+model_torch = torch.load(os.path.join(ckp_dir, "final_model.pth"))
 print("done.")
 # -------------------------------------------------------- #
 #                        test model                        #
@@ -64,7 +66,7 @@ print("> start testing model...")
 
 # ------------------- test torch model ------------------- #
 print(">> test torch model")
-_dummy_torch_in = torch.tensor([1, 2, 3], dtype=torch.float32)
+_dummy_torch_in = torch.tensor([1, 2, 3], dtype=torch.float32, device="cuda:0")
 _dummy_torch_out = model_torch(_dummy_torch_in)
 print("torch native model inference test:\n" + "-" * 20)
 print(f"torch_in: {_dummy_torch_in}, torch_out: {_dummy_torch_out}")
@@ -81,7 +83,9 @@ def convert_onnx(model, onnx_path):
     model.eval()  # 设置为评估模式
     batch_size = 1  # 批处理大小
     input_shape = 3  # 输入数据长度
-    dummy_input = torch.randn(batch_size, input_shape, requires_grad=False).to(next(model.parameters()).device)
+    dummy_input = torch.randn(batch_size, input_shape, requires_grad=False).to(
+        next(model.parameters()).device
+    )
     export_onnx_file = onnx_path  # 目的 ONNX 文件名
 
     # # ------------ remove nn.DataParallel wrapper ------------ #
@@ -95,7 +99,9 @@ def convert_onnx(model, onnx_path):
     # model.eval()
 
     torch.onnx.export(
-        model.module if model.__class__.__name__ == "DataParallel" else model,  # 待转换模型
+        (
+            model.module if model.__class__.__name__ == "DataParallel" else model
+        ),  # 待转换模型
         dummy_input,  # 输入张量
         export_onnx_file,  # 目的 ONNX 文件名
         opset_version=10,  # ONNX 版本
@@ -140,7 +146,9 @@ ort_output = ort_session.run(None, ort_inputs)[0]
 print("onnx model inference test:\n" + "-" * 20)
 print(f"onnx_in: {ort_inputs}, onnx_out: {ort_output}")
 
-if np.allclose(_dummy_torch_out.detach().cpu().numpy(), ort_output, rtol=1e-03, atol=1e-05):
+if np.allclose(
+    _dummy_torch_out.detach().cpu().numpy(), ort_output, rtol=1e-03, atol=1e-05
+):
     print("Torch model and onnx model outputs are consistent.")
 print("> test done.")
 # -------------------------------------------------------- #
@@ -166,11 +174,13 @@ scaler_y.var_ = np.array([1])
 
 def save_usecase(usecase_input: list[int], usecase_path: str):
     usecase_input = np.array([usecase_input]).astype(np.float32)
-    usecase_input.astype(np.float32)
+    # usecase_input.astype(np.float32)
     usecase_onnx_input = {
-        "modelInput": scaler_x.transform(usecase_input)
-        if isinstance(usecase_input, np.ndarray)
-        else scaler_x.transform(usecase_input.numpy())
+        "modelInput": (
+            scaler_x.transform(usecase_input).numpy()
+            # if isinstance(usecase_input, np.ndarray)
+            # else scaler_x.transform(usecase_input.numpy())
+        )
     }
     usecase_onnx_output = ort_session.run(None, usecase_onnx_input)
     usecase_output = scaler_y.inverse_transform(usecase_onnx_output[0].reshape(-1, 1))
@@ -200,7 +210,7 @@ def save_usecase(usecase_input: list[int], usecase_path: str):
 print(">> save use case...", end="")
 usecase_path = os.path.join(path_release, "usecase.txt")
 
-save_usecase([90, 41, 31], usecase_path)
+save_usecase([88.5, 81.1, 11.9], usecase_path)
 save_usecase([68, 46, 83], usecase_path)
 save_usecase([19, 45, 80], usecase_path)
 save_usecase([1, 64, 58], usecase_path)

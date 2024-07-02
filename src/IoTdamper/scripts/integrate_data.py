@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2023-10-09 09:42:54
 * ----------------------------
-* Modified: 2023-10-09 10:30:21
+* Modified: 2024-06-14 20:37:59
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -16,7 +16,7 @@ import os
 
 import pandas as pd
 
-directory_path = r"./data/IoT-Damper_v5_320250"  # 输入目录路径
+directory_path = r"/workspace/src/IoTdamper/data/v6/V6_250160"  # 输入目录路径
 output_path = os.path.join(directory_path, "IoTDamper.xlsx")  # 输出路径
 # 划出验证集
 num_spacelines = 6
