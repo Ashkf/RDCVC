@@ -41,15 +41,11 @@ def ctfd(data: dict[str, Tensor], keys: list[str] | None = None) -> Tensor:
     if keys is None:
         keys = list(data.keys())
     _sub_dict = {k: data[k] for k in keys}  # 根据 keys 从 dict 中取出对应的子字典
-    _tensor = torch.stack(
-        [_sub_dict[k] for k in _sub_dict.keys()], dim=1
-    )  # 子字典值拼接 tensor
+    _tensor = torch.stack([_sub_dict[k] for k in _sub_dict.keys()], dim=1)  # 子字典值拼接 tensor
     return _tensor
 
 
-def dynamic_weight_average(
-    loss_t_1, loss_t_2, T=2, limit_L=None, limit_R=None, c=None
-) -> Tensor:
+def dynamic_weight_average(loss_t_1, loss_t_2, T=2, limit_L=None, limit_R=None, c=None) -> Tensor:
     r"""DWA (Dynamic Weighting Average)
 
     Warnings:
@@ -90,9 +86,7 @@ def dynamic_weight_average(
         3. 若 c 不为 None，则会对 lambda 进行额外的权重调整
         4. 若不启用上下限和额外权重调整，则为经典的 DWA
     """
-    assert len(loss_t_1) == len(
-        loss_t_2
-    ), "loss_t_1 and loss_t_2 must have the same length"
+    assert len(loss_t_1) == len(loss_t_2), "loss_t_1 and loss_t_2 must have the same length"
 
     K = len(loss_t_1)  # K: number of tasks
 
@@ -112,7 +106,8 @@ def dynamic_weight_average(
     return _lambda
 
 
-def uncertainty_to_weigh_losses(): ...
+def uncertainty_to_weigh_losses():
+    ...
 
 
 class MetricsComputer:
@@ -174,17 +169,12 @@ class MetricsComputer:
             try:
                 metrics = self.metrics
             except AttributeError as err:
-                raise AttributeError(
-                    "self.metrics is None, please compute metrics first."
-                ) from err
+                raise AttributeError("self.metrics is None, please compute metrics first.") from err
 
         # ---------------------------------- 计算损失 ----------------------------------
         if "mtl" in _model_prefix:
             loss = [
-                v
-                for k, v in metrics.items()
-                if k.split("/")[0] == "train"
-                and k.split("/")[1].split("_")[0] == "loss"
+                v for k, v in metrics.items() if k.split("/")[0] == "train" and k.split("/")[1].split("_")[0] == "loss"
             ]
             loss = self._use_loss_weight(loss)
         else:
@@ -215,9 +205,7 @@ class MetricsComputer:
                     c=args.DWA_weight,
                 )  # 计算权重
         else:
-            raise NotImplementedError(
-                f"Unknown loss optimization strategy: {self.loss_weight_strategy}"
-            )
+            raise NotImplementedError(f"Unknown loss optimization strategy: {self.loss_weight_strategy}")
         self.logger.record_loss_weight(_weight.reshape(1, -1))  # 写入 logger.recorder
 
     @staticmethod
@@ -258,12 +246,8 @@ class MetricsComputer:
         UPDATE: 2024-05-31
         """
         # ---------------------- 反归一化 (若对标签采取归一化) ----------------------
-        _pred = self.scaler.scale(
-            pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
-        ).to("cpu")
-        _target = self.scaler.scale(
-            target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
-        ).to("cpu")
+        _pred = self.scaler.scale(pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
+        _target = self.scaler.scale(target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
 
         # ------------------------ metrics ----------------------- #
         prefix = "train/" if is_train else "val/"  # 前缀，用于区分训练和验证
@@ -288,25 +272,17 @@ class MetricsComputer:
         """
         # ------------------------- loss ------------------------- #
         # per loss shape: (num_feature, )
-        assert (
-            pred[0].shape[1] == 4
-        ), "The task involving airflow has four specific targets."
+        assert pred[0].shape[1] == 4, "The task involving airflow has four specific targets."
         _loss_airflow = self._calc_loss_l2(pred[0], target[:, :4])
-        assert (
-            pred[1].shape[1] == 6
-        ), "The task involving pressure has six specific targets."
+        assert pred[1].shape[1] == 6, "The task involving pressure has six specific targets."
         _loss_rm_pres = self._calc_loss_l2(pred[1], target[:, 4:])
 
         # ---------------------- 反归一化 (若对标签采取归一化) ----------------------
         # !!! 会破坏 tensor 的计算图
         # !!! scale 内部会进行 x.numpy() 操作，会破坏 tensor 的计算图
         _pred = torch.cat(pred, dim=1)  # Tensor(batch_size, num_target)
-        _pred = self.scaler.scale(
-            _pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
-        ).to("cpu")
-        _target = self.scaler.scale(
-            target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
-        ).to("cpu")
+        _pred = self.scaler.scale(_pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
+        _target = self.scaler.scale(target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
 
         # ------------------------ metrics ----------------------- #
         prefix = "train/" if is_train else "val/"  # 前缀，用于区分训练和验证
@@ -320,9 +296,7 @@ class MetricsComputer:
         }
         return metrics
 
-    def _comp_metrics_byTarget(
-        self, pred: Tuple[Tensor] | List[Tensor], target, is_train
-    ):
+    def _comp_metrics_byTarget(self, pred: Tuple[Tensor] | List[Tensor], target, is_train):
         """按照每个目标计算指标"""
 
         # pred: Tuple(Tensor(batch_size, 1) * num_tasks)
@@ -333,12 +307,8 @@ class MetricsComputer:
         _losses = self._calc_loss_l2(pred, target)
 
         # ---------------------- 反归一化 (若对标签采取归一化) ----------------------
-        _pred = self.scaler.scale(
-            pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
-        ).to("cpu")
-        _target = self.scaler.scale(
-            target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION
-        ).to("cpu")
+        _pred = self.scaler.scale(pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
+        _target = self.scaler.scale(target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
 
         # ------------------------ metrics ----------------------- #
         prefix = "train/" if is_train else "val/"  # 前缀，用于区分训练和验证
