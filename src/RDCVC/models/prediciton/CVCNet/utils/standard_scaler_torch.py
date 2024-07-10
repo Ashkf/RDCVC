@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-02-07 00:20:50
 * ----------------------------
-* Modified: 2024-06-01 16:01:41
+* Modified: 2024-07-01 10:26:58
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -99,7 +99,7 @@ class StandardScalerTorch:
         if (self.scale_ == 0).any():
             raise ValueError("标准差为 0 时，无法进行缩放")
 
-        return (X.cpu() - self.mean_) / torch.max(self.scale_, torch.tensor(1e-7))
+        return (X - self.mean_) / torch.max(self.scale_, torch.tensor(1e-7))
 
     def inverse_transform(self, X: Tensor | ndarray) -> Tensor:
         """将数据缩放回原始表征。

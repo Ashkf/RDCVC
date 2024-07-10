@@ -7,16 +7,20 @@ import torch
 import torch.nn as nn
 
 from .base_mtl import BaseMTL
+from .base_mtl_kane import BaseMTLKANe
 from .cvcnet import CVCNet
 from .IoTDamper_mlp import DAPN12
 from .kan_efficient import KANe
+from .mlp import MLP
 
 type2model = {
     "dapn12": DAPN12,
-    "split-mtl": BaseMTL,
+    "split-mtl-mlp": BaseMTL,
+    "split-mtl-kane": BaseMTLKANe,
     "dense-mtl": BaseMTL,
     "cvcnet-mtl-mlp": CVCNet,
     "kane": KANe,
+    "mlp": MLP,
 }
 
 
@@ -28,13 +32,25 @@ def select_model(model_type: str):
     match _model_name:
         case "dapn12":
             return DAPN12()
-        case "split-mtl":
-            # e.g.: split-mtl_18-32-32_leakyrelu
+        case "mlp":
+            return MLP(
+                width=[int(v) for v in _type[1].split("-")],
+                activation_fn=_type[2],
+            )
+        case "split-mtl-mlp":
+            # e.g.: split-mtl-mlp_18-32-32_leakyrelu
             return BaseMTL(
                 bottom_width=[int(v) for v in _type[1].split("-")],
                 tower_width=[],
                 target_dict={"Airflow": 4, "Pres": 6},
-                activation=_type[2],
+                activation=_type[2] if len(_type) > 2 else "leakyrelu",
+            )
+        case "split-mtl-kane":
+            # e.g.: split-mtl-kane_18-32-32
+            return BaseMTLKANe(
+                bottom_width=[int(v) for v in (_type[1]).split("-")],
+                tower_width=[],
+                target_dict={"Airflow": 4, "Pres": 6},
             )
         case "dense-mtl":
             # e.g.: dense-mtl_18-32-32_leakyrelu
