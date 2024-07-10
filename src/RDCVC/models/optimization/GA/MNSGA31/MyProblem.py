@@ -10,7 +10,7 @@
 * Soochow University
 * Created: 2023-11-15 22:25:50
 * ----------------------------
-* Modified: 2024-07-07 10:05:24
+* Modified: 2024-07-10 13:08:57
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -23,7 +23,8 @@ import pickle
 import geatpy as ea
 import numpy as np
 import torch
-from pop_history import pop_history
+
+# from pop_history import pop_history
 
 DESIGN_PRESSURE = np.array([10, 15, 32, 32, 30, 25])  # 房间压差设计值
 ROOM_HEIGHT = 2.2  # 层高为 2.2m
@@ -145,8 +146,8 @@ class MNSGA31(ea.Problem):  # 继承 Problem 父类
 
         pop.CV = np.column_stack([c_RP, c_TSV, c_TEV_l, c_TEV_h])
         # ----------------- Save history data ----------------- #
-        pop_history["average_freq_mean"].append(np.mean(freq_mean))
-        pop_history["best_freq_mean"].append(np.min(freq_mean))
+        # pop_history["average_freq_mean"].append(np.mean(freq_mean))
+        # pop_history["best_freq_mean"].append(np.min(freq_mean))
 
     def _model_eval(self, Phen):
         """基于神经网络代理模型，使用决策变量计算受控变量。
