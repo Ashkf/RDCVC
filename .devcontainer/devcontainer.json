@@ -69,15 +69,16 @@
 			],
 			"settings": {
 				"[python]": {
-					"editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.defaultFormatter": "charliermarsh.ruff",
 					"editor.formatOnSave": true,
+					"editor.codeLens": true,
 					"editor.codeActionsOnSave": {
-						"source.fixAll.ruff": true,
-						"source.organizeImports.ruff": true
+						"source.fixAll.ruff": "explicit",
+						"source.organizeImports.ruff": "explicit"
 					},
 					"editor.formatOnType": true,
 					"editor.rulers": [
-						88
+						90
 					]
 				},
 				"editor.cursorStyle": "line",
@@ -184,7 +185,6 @@
 					"source.fixAll": true, // notebook 保存时自动修复可修复的 lint 错误
 					"source.organizeImports": true // notebook 保存时自动排序 import 语句
 				},
-				"black-formatter.showNotifications": "always",
 				"editor.stickyScroll.enabled": true,
 				"svg.preview.mode": "svg",
 				"workbench.tree.indent": 8,
@@ -196,7 +196,7 @@
 					"reportOptionalCall": "none"
 				},
 				"diffEditor.ignoreTrimWhitespace": false,
-				"sourcery.codeLens": false,
+				"sourcery.codeLens": true,
 				/* ---------------- psi file header start --------------- */
 				"psi-header.config": {
 					"forceToTop": true,
@@ -213,7 +213,7 @@
 					"isActive": true,
 					"modAuthor": "Modified By:",
 					"modDate": "Modified:",
-					"modDateFormat": "dd/MM/yyyy HH:mm:ss",
+					"modDateFormat": "dd/MM/yyyy hh:nn:ss",
 					"autoHeader": "autoSave",
 					"include": [
 						"python"
@@ -279,28 +279,26 @@
 				"workbench.tree.renderIndentGuides": "always",
 				"notebook.undoRedoPerCell": false,
 				"notebook.output.textLineLimit": 14,
-				"notebook.scrolling.experimental.anchorToFocusedCell": "off",
 				"editor.minimap.enabled": false,
 				"editor.accessibilitySupport": "on",
+				"sourcery.token": "user_GwFVtigoenFwtu9NJNtmGJpu34ZXaHsnnuJjA66xJQcxmVpKhnU_BDt9FGg",
 				"markdown.extension.preview.autoShowPreviewToSide": true,
 				"workbench.editor.enablePreviewFromQuickOpen": true,
 				"git.autofetch": true,
-				"colorIdentifiersMode.method": "hash",
-				"colorIdentifiersMode.tokenKinds": [
-					"python",
-					"variable",
-					"parameter",
-					"property"
-				],
+				"remote.autoForwardPortsSource": "hybrid",
+				"github.copilot.editor.enableAutoCompletions": true,
 				"terminal.integrated.env.osx": {
-					"PYTHONPATH": "${workspaceFolder}/",
+					"PYTHONPATH": "${workspaceFolder}/"
 				},
 				"terminal.integrated.env.linux": {
-					"PYTHONPATH": "${workspaceFolder}/",
+					"PYTHONPATH": "${workspaceFolder}/"
 				},
 				"terminal.integrated.env.windows": {
-					"PYTHONPATH": "${workspaceFolder}/",
-				}
+					"PYTHONPATH": "${workspaceFolder}/"
+				},
+				"git.ignoreRebaseWarning": true,
+				"explorer.autoReveal": "focusNoScroll",
+				"editor.fontLigatures": true
 			}
 		}
 	}

@@ -126,17 +126,17 @@ DOPNN/
 
 写死的一个 mlp 模型。
 
-### split-mtl
+### split-mtl-[mlp, kane]
 
 model_type:
 
 ```
-split-mtl_<layer_widths>_<optimizer>
+split-mtl-[mlp, kane]_<layer_widths>_<optimizer>
 ```
 
-例如：一个深度为 3，输入特征数为 10，输出特征数为 2，两层隐藏层宽度分别为 64 和 32，优化器为 adam 的模型，model_type 为：`split-mtl_10:64:32:2_adam`。
+例如：一个深度为 3，输入特征数为 10，输出特征数为 2，两层隐藏层宽度分别为 64 和 32，优化器为 adam 的模型，model_type 为：`split-mtl-mlp_10:64:32:2_adam`。
 
-该模型本质为一个 MLP 组成共享底层，然后每类任务有一个独立的输出层。
+该模型本质为一个 ML/KANe 组成共享底层，然后每类任务有一个独立的输出层。
 
 ### dense-mtl
 
