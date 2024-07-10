@@ -1,3 +1,17 @@
 {
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+    "jupyter.notebookFileRoot": "${workspaceFolder}/src/RDCVC",
+    "debug.inlineValues": "on",
+    "conventionalCommits.scopes": [
+        "CVCNet",
+        "trainer",
+        "optimization",
+        "prediction"
+    ],
+    "todo-tree.tree.scanMode": "workspace",
+    "python.testing.pytestArgs": [
+        "src"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
 }
