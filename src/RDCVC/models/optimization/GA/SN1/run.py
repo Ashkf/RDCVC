@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-01-07 10:30:07
 * ----------------------------
-* Modified: 2024-03-25 20:49:56
+* Modified: 2024-07-05 12:19:37
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -218,9 +218,7 @@ def main(args):
     # 保存进化过程的种群信息 (trace)
     # algorithm.trace 的结构：{'f_best': [], 'f_avg': []}
     pd.DataFrame(algorithm.trace).to_csv(save_dirName + "/" + "trace.csv", index=False)
-    pd.DataFrame(pop_history).to_csv(
-        save_dirName + "/" + "pop_history.csv", index=False
-    )
+    pd.DataFrame(pop_history).to_csv(save_dirName + "/" + "pop_history.csv", index=False)
 
     # 保存最优解
     res = results_postprocess(res, problem._model_eval)
