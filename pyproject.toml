@@ -62,6 +62,7 @@ scikit-criteria = "^0.8.7"
 pydantic = "^2.8.2"
 pydantic-core = "^2.20.1"
 annotated-types = "^0.7.0"
+networkx = "^3.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -101,19 +102,18 @@ build-backend = "poetry.core.masonry.api"
 line-length = 90
 preview = true
 
-
 # https://beta.ruff.rs/docs/settings/
 [tool.ruff]
-line-length = 80
+line-length = 90
 task-tags = ["TODO", "todo", "FIXME", "fixme", "BUG", "bug", "NOTE", "note"]
 # https://beta.ruff.rs/docs/rules/
 select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "F", # pyflakes
-    "I", # isort
-    "C", # flake8-comprehensions
-    "B", # flake8-bugbear
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
     "UP",
 ]
 ignore = [
