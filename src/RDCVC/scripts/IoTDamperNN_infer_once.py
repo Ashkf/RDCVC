@@ -1,12 +1,12 @@
 """
-* 神经网络预测脚本，用于测试单次预测
+* 用于实现物联网风阀神经网络的单次推理
 *
-* File: test.py
+* File: IoTDamperNN_infer_once.py
 * Author: Fan Kai
 * Soochow University
 * Created: 2024-03-09 23:01:26
 * ----------------------------
-* Modified: 2024-03-09 23:06:49
+* Modified: 2024-07-15 22:23:04
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
