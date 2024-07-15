@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-07-13 17:57:14
 * ----------------------------
-* Modified: 2024-07-14 15:14:25
+* Modified: 2024-07-14 23:44:58
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -21,6 +21,9 @@ import numpy as np
 from networkx import DiGraph, graph_edit_distance
 from pydantic import BaseModel, field_validator, model_validator
 from typing_extensions import Self
+
+# DPGD 最大值，与具体情况有关，包括压差设计值、压差权重、边权重等
+DPGD_MAX = 24  # 此处 24 使用 LHS 进行 100000 个样本采样测试得出
 
 
 class CleanroomData(BaseModel):
@@ -234,16 +237,42 @@ def DPGD(
 
 
 if __name__ == "__main__":
-    data_d = CleanroomData(
-        rooms=["a", "b", "c"],
-        room_pressures=[100, 110, 121],
-        room_relations=[("b", "a"), ("c", "b")],
+    data_design = CleanroomData(
+        rooms=["a", "b", "c", "d", "e", "f", "O"],
+        room_pressures=[10, 15, 25, 30, 35, 30, 0],
+        room_relations=[
+            ("b", "a"),  # b -> a
+            ("c", "b"),
+            ("d", "c"),
+            ("e", "c"),
+            ("f", "c"),
+            ("e", "d"),
+            ("a", "O"),
+            ("c", "O"),
+        ],
     )
 
     data_c = CleanroomData(
-        rooms=["a", "b", "c"],
-        room_pressures=[100, 120, 121],
-        room_relations=[("b", "a"), ("c", "b")],
+        rooms=["a", "b", "c", "d", "e", "f", "O"],
+        room_pressures=[0, 0, 0, 0, 0, 0, 0],
+        room_relations=[
+            ("b", "a"),  # b -> a
+            ("c", "b"),
+            ("d", "c"),
+            ("e", "c"),
+            ("f", "c"),
+            ("e", "d"),
+            ("a", "O"),
+            ("c", "O"),
+        ],
     )
 
-    print(DPGD(data_d, data_c))
+    print(DPGD(data_design, data_c))
+
+    # 运行时间测试
+    import timeit
+
+    res = timeit.timeit("DPGD(data_design, data_c)", globals=globals(), number=10000)
+
+    # 受限于 graph_edit_distance 函数（NP hard）的性能，0.00091 ~ 0.0028 s/次
+    print(f"10000 次运行时间：{res}，平均时间：{res/10000}")

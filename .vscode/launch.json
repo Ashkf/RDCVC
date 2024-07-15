@@ -59,13 +59,14 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "--nind=100", // 种群规模
-                "--maxgen=100", //最大进化代数
-                //"--maxtime=120" // 最大进化时间 (s)
-                "--nnpath=/workspace/checkpoints/NN/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-07-01T10-33-57/final_model.pth",
+                "--nind=500", // 种群规模
+                "--maxgen=50", //最大进化代数
+                // "--maxtime=360", // 最大进化时间 (s)
+                "--nnpath=/workspace/checkpoints/NN/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-07-15T12-29-54/final_model.pth",
+                "--prefix=test",
                 "--scaler_path",
-                "/workspace/checkpoints/NN/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-07-01T10-33-57/x_normalizer.pkl",
-                "/workspace/checkpoints/NN/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-07-01T10-33-57/y_normalizer.pkl"
+                "/workspace/checkpoints/NN/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-07-15T12-29-54/x_normalizer.pkl",
+                "/workspace/checkpoints/NN/cvcnet-mtl-mlp_18_1_2_3_64-64-64_64-64-64_BS16_LR0.01_EP10000_2024-07-15T12-29-54/y_normalizer.pkl"
             ]
         },
         {

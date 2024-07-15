@@ -81,6 +81,7 @@
 						90
 					]
 				},
+				"python.languageServer": "Pylance",
 				"editor.cursorStyle": "line",
 				"editor.inlineSuggest.enabled": true,
 				"editor.unicodeHighlight.allowedLocales": {

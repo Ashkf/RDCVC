@@ -2,15 +2,19 @@
 * 多目标、基于神经网络的遗传 problem 类
 * 该 problem：MNSGA31
 *       * 决策变量：3 个风机频率的十倍 + 7 个送风阀开度 + 4 个回风阀开度 + 4 个排风阀开度
-*       * 目标函数：最小化能耗，最大化压差控制效果（以最小化平均压差误差暂时替代），最小化换气次数偏差
-*       * 约束条件：风阀开度范围，风机频率范围，全开风阀数量（>87 视为全开），最小系统送风限制，最小系统排风限制和压差最大偏差
+*       * 目标函数：
+*           1. 最小化能耗
+*           2. 最小化压差梯度差异性 DPGD
+*           3. 最小化换气次数偏差
+*       * 约束条件：风阀开度范围，风机频率范围，全开风阀数量（>87 视为全开），
+*                  最小系统送风限制，最小系统排风限制和压差最大偏差
 *
 * File: MyProblem.py
 * Author: Fan Kai
 * Soochow University
 * Created: 2023-11-15 22:25:50
 * ----------------------------
-* Modified: 2024-07-10 13:08:57
+* Modified: 2024-07-15 22:14:17
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -24,12 +28,31 @@ import geatpy as ea
 import numpy as np
 import torch
 
+from src.RDCVC.utils.dpgd import DPGD, CleanroomData
+
 # from pop_history import pop_history
 
-DESIGN_PRESSURE = np.array([10, 15, 32, 32, 30, 25])  # 房间压差设计值
+DESIGN_PRESSURE = [10, 15, 32, 32, 30, 25]  # 房间压差设计值
 ROOM_HEIGHT = 2.2  # 层高为 2.2m
-ROOM_AREA = np.array([4.475, 6, 12.33, 13.425, 11.8422, 16.6848])  # 房间面积
-SYSTEM_VOLUME = np.sum(ROOM_HEIGHT * ROOM_AREA)  # 整体体积
+ROOM_AREA = [4.475, 6, 12.33, 13.425, 11.8422, 16.6848]  # 房间面积
+SYSTEM_VOLUME = np.sum(
+    np.array(ROOM_AREA, dtype=float) * (np.array(ROOM_HEIGHT, dtype=float))
+)  # 整体体积
+
+DESIGN_DATA = CleanroomData(
+    rooms=["a", "b", "d", "e", "f", "c", "O"],
+    room_pressures=DESIGN_PRESSURE + [0],
+    room_relations=[
+        ("d", "c"),
+        ("e", "c"),
+        ("e", "d"),
+        ("f", "c"),
+        ("c", "O"),
+        ("c", "b"),
+        ("b", "a"),  # b -> a
+        ("a", "O"),
+    ],
+)
 
 
 class MNSGA31(ea.Problem):  # 继承 Problem 父类
@@ -43,6 +66,7 @@ class MNSGA31(ea.Problem):  # 继承 Problem 父类
 
         # -------------------------- 目标 -------------------------- #
         M = 3  # 目标维数、f 的数量
+        self.objectives = ["E", "DPGD", "ACH err"]  # 目标名称列表
         maxormins = [1, 1, 1]  # 目标最小最大化标记列表，1：min；-1：max
 
         # ------------------------- 决策变量 ------------------------- #
@@ -74,14 +98,13 @@ class MNSGA31(ea.Problem):  # 继承 Problem 父类
         Args:
             pop (Population): 一个种群对象，里面包含了种群的所有信息
         """
-        ref_pres = np.array([10, 15, 32, 32, 30, 25])  # 房间压差设计值
         ref_total_SV = 3760  # 总送风量设计参考值
         # ref_total_OV = 2312  # 新风量设计参考值
         # ref_total_RV = 1448  # 回风量设计参考值
         ref_total_EV = 1600  # 总排风量设计参考值
 
         # ---------- Calculate objective function value ---------- #
-        # features: decision variables + controlled variables
+        # features: decision variables + controlled variables，参照文件末尾的变量顺序
         # order as the end of this file
         features = self._model_eval(pop.Phen)  # (num_pop, 28)
         # total_RV = features[:, -7]
@@ -89,23 +112,30 @@ class MNSGA31(ea.Problem):  # 继承 Problem 父类
         total_SV = features[:, -9]
         # total_OV = features[:, -10]
 
-        # 参照文件末尾的变量顺序
         mau_freq = features[:, 0].reshape(-1, 1)
         ahu_freq = features[:, 1].reshape(-1, 1)
         ef_freq = features[:, 2].reshape(-1, 1)
-        freq_mean = np.mean(features[:, :3], axis=1).reshape(-1, 1)
+        # freq_means = np.mean(features[:, :3], axis=1).reshape(-1, 1)
 
         # 全开风阀数量 DMPR, >87 视为全开
-        num_full_open = np.sum(features[:, 3:17] > 87, axis=1)
-
-        f1 = (mau_freq + ahu_freq + ef_freq) / 3
+        # num_full_open = np.sum(features[:, 3:17] > 87, axis=1)
 
         room_pres = features[:, -6:]
-        room_pres_err = np.abs(room_pres - ref_pres)  # 逐房间压差偏差
-        room_pres_rmse = np.sqrt(
-            np.mean(np.square(room_pres - ref_pres), axis=1)
+        room_pres_err = np.abs(room_pres - DESIGN_PRESSURE)  # 逐房间压差偏差
+        # room_pres_rmse = np.sqrt(
+        #     np.mean(np.square(room_pres - DESIGN_PRESSURE), axis=1)
+        # ).reshape(-1, 1)
+
+        DPGDs = np.apply_along_axis(
+            self._cal_DPGD,
+            axis=1,
+            arr=np.hstack([room_pres, np.zeros((room_pres.shape[0], 1))]),  # 末尾添加 0
         ).reshape(-1, 1)
-        f2 = room_pres_rmse
+
+        f1 = (mau_freq**3 + ahu_freq**3 + ef_freq**3) / 3
+
+        # f2 = room_pres_rmse
+        f2 = DPGDs
 
         f3 = (np.abs(total_SV - ref_total_SV) / SYSTEM_VOLUME).reshape(-1, 1)
 
@@ -131,12 +161,15 @@ class MNSGA31(ea.Problem):  # 继承 Problem 父类
         # c_TRV = np.abs(total_RV - ref_total_RV) / ref_total_RV - 0.05
 
         # 排风量约束，在设计值的 1~1.1 倍之间
-        c_TEV_l = ref_total_EV - total_EV
+        # c_TEV_l = ref_total_EV - total_EV
         c_TEV_h = total_EV - ref_total_EV * 1.1
         # c_TEV = np.abs(total_EV - ref_total_EV) / ref_total_EV - 0.05
 
+        # DPGD 约束，必须为非负数
+        c_DPGD = -DPGDs
+
         # 房间压差约束，任意房间偏差不超过 5 Pa
-        c_RP = np.max(room_pres_err, axis=1) - 1
+        c_RP = np.max(room_pres_err, axis=1) - 5
 
         # mau 频率约束，不小于 10Hz
         # c_MAU = 10 - mau_freq
@@ -144,7 +177,7 @@ class MNSGA31(ea.Problem):  # 继承 Problem 父类
         # 全开风阀数量约束，至少 1 个 DMPR 全开
         # c_FO = 1 - num_full_open
 
-        pop.CV = np.column_stack([c_RP, c_TSV, c_TEV_l, c_TEV_h])
+        pop.CV = np.column_stack([c_TSV, c_TEV_h, c_RP, c_DPGD])
         # ----------------- Save history data ----------------- #
         # pop_history["average_freq_mean"].append(np.mean(freq_mean))
         # pop_history["best_freq_mean"].append(np.min(freq_mean))
@@ -184,6 +217,31 @@ class MNSGA31(ea.Problem):  # 继承 Problem 父类
         )
 
         return np.hstack((_dcsn_var, _ctrl_var))
+
+    def _cal_DPGD(self, room_pres: np.ndarray):
+        "operates on 1-D arrays"
+        data_compare = CleanroomData(
+            rooms=["a", "b", "d", "e", "f", "c", "O"],
+            room_pressures=room_pres,
+            room_relations=[
+                ("d", "c"),
+                ("e", "c"),
+                ("e", "d"),
+                ("f", "c"),
+                ("c", "O"),
+                ("c", "b"),
+                ("b", "a"),  # b -> a
+                ("a", "O"),
+            ],
+        )
+        return DPGD(
+            DESIGN_DATA,
+            data_compare,
+            k_vertice=1,
+            k_edge=2,
+            timeout=1,
+            show_err=False,
+        )
 
 
 # 以下为决策（可控）变量和受控变量的顺序

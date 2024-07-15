@@ -6,7 +6,7 @@
 * Soochow University
 * Created: 2024-01-07 10:30:07
 * ----------------------------
-* Modified: 2024-07-07 10:03:53
+* Modified: 2024-07-15 21:02:31
 * Modified By: Fan Kai
 * ========================================================================
 * HISTORY:
@@ -46,21 +46,17 @@ class OptimizationArgs(BaseModel):
     maxtime: int | None  # unit: seconds
     nnpath: str
     scaler_path: list[str]
+    prefix: str | None
 
 
 def parse_arguments() -> OptimizationArgs:
     parser = ArgumentParser(description="Run the GA optimization algorithm.")
     parser.add_argument("--nind", type=int, help="Population size.")
-    parser.add_argument(
-        "--maxgen", type=int, help="Maximum number of generations."
-    )
-    parser.add_argument(
-        "--maxtime", type=int, help="Maximum running time in seconds."
-    )
-    parser.add_argument(
-        "--nnpath", type=str, help="Path to the neural network model."
-    )
+    parser.add_argument("--maxgen", type=int, help="Maximum number of generations.")
+    parser.add_argument("--maxtime", type=int, help="Maximum running time in seconds.")
+    parser.add_argument("--nnpath", type=str, help="Path to the neural network model.")
     parser.add_argument("--scaler_path", type=str, nargs=2)
+    parser.add_argument("--prefix", type=str, default="test", help="Prefix for save dir.")
     return OptimizationArgs(**vars(parser.parse_args()))
 
 
@@ -80,7 +76,7 @@ def main(args: OptimizationArgs):
     save_dirName = gen_save_dir(
         problem.name,
         algorithm.name,
-        prefix="test",
+        prefix=args.prefix,
         NIND=args.nind,
         MAXGEN=args.maxgen,
         MAXTIME=args.maxtime,
@@ -107,14 +103,12 @@ def main(args: OptimizationArgs):
     print("用时：%f秒" % (res["executeTime"]))
     print("评价次数：%d次" % (res["nfev"]))
     print("非支配个体数：%d个" % (NDSet.sizes))
-    print(
-        f"单位时间找到帕累托前沿点个数：{NDSet.sizes / res['executeTime']: .2f} 个/s"
-    )
+    print(f"单位时间找到帕累托前沿点个数：{NDSet.sizes / res['executeTime']: .2f} 个/s")
 
-    draw_pareto_front(NDSet, save_dirName)
+    draw_3D_pareto_front(NDSet, problem.objectives, save_dirName)
 
     tradeoff_solution: Population = select_tradeoff_solution(
-        NDSet, [min, max, min], ["E", "DPerr", "ACHerr"]
+        NDSet, [min, min, min], problem.objectives
     )
     tfs_metrics = evaluate_soulution(
         tradeoff_solution, problem._model_eval, print_metrics=True
@@ -125,24 +119,20 @@ def main(args: OptimizationArgs):
         json.dump(tfs_metrics, f, indent=4)
 
 
-def draw_pareto_front(NDSet: Population, save_dirName: str):
+def draw_3D_pareto_front(NDSet: Population, objectives: list[str], save_dirName: str):
     # 使用 matplot 绘制 NDSet Pareto 前沿图
     fig = plt.figure()
     ax = fig.add_subplot(projection="3d")
     ax.grid(True)
-    ax.scatter(
-        NDSet.ObjV[:, 0], NDSet.ObjV[:, 1], NDSet.ObjV[:, 2], c="r", marker="o"
-    )
-    ax.set_xlabel("Obj_E (Hz)")
-    ax.set_ylabel("Obj_P (Pa)")
-    ax.set_zlabel("Obj_ACH")
+    ax.scatter(NDSet.ObjV[:, 0], NDSet.ObjV[:, 1], NDSet.ObjV[:, 2], c="r", marker="o")
+    ax.set_xlabel(f"{objectives[0]}, 20000≈25^3, 60000≈39^3")
+    ax.set_ylabel(f"{objectives[1]}")
+    ax.set_zlabel(f"{objectives[2]}")
     plt.savefig(save_dirName + "/" + "ParetoFront.png")
     plt.show()
 
 
-def evaluate_soulution(
-    solution: Population, eval_func, print_metrics=False
-) -> dict:
+def evaluate_soulution(solution: Population, eval_func, print_metrics=False) -> dict:
     assert solution.ChromNum == 1, "solution should be a single individual."
 
     ref_pres = np.array([10, 15, 32, 32, 30, 25])  # 房间压差设计值
@@ -231,25 +221,17 @@ def evaluate_soulution(
     }
 
 
-def select_tradeoff_solution(
-    NDSet: Population, objectives, criteria
-) -> Population:
+def select_tradeoff_solution(NDSet: Population, objectives, criteria) -> Population:
     # ----------------- 使用客观赋权法 CRITIC 计算权衡解 ----------------- #
     if NDSet.ObjV is None:
         raise ValueError("NDSet.ObjV is None.")
 
-    rawData_mat: ndarray = (
-        NDSet.ObjV
-    )  # 2D array-like, shape (n_samples, n_criteria)
+    rawData_mat: ndarray = NDSet.ObjV  # 2D array-like, shape (n_samples, n_criteria)
     # 无量纲化处理，并使得所有指标都是最大化标准
     stdData_mat = dimensionless(rawData_mat, objectives)
     dm = mkdm(
         stdData_mat,
-        [
-            max,
-            max,
-            max,
-        ],  # CRITIC 原始论文仅建议用于最大化标准 [Diakoulaki et al., 1995]
+        [max, max, max],  # CRITIC 原始论文仅建议用于最大化标准 [Diakoulaki et al., 1995]
         criteria=criteria,
     )
     dm = CRITIC().transform(dm)  # 计算权重（已验证）
@@ -261,7 +243,7 @@ def select_tradeoff_solution(
 
 
 def dimensionless(x, objectives):
-    # 无量纲化处理（正/逆向化）
+    # 无量纲化处理（正/逆向化）, 使得所有指标都是最大化标准
     # 若该指标越大越好（正向指标），则 x' = (x - x_min) / (x_max - x_min)
     # 若该指标越小越好（负向指标），则 x' = (x_max - x) / (x_max - x_min)
 
