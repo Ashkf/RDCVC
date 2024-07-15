@@ -11,7 +11,6 @@
 
 """
 
-from typing import List, Tuple
 
 import numpy as np
 import torch
@@ -256,7 +255,7 @@ class MetricsComputer:
             f"{prefix}mape": self._calc_mape(_pred, _target),
         }
 
-    def _comp_metrices_byTasksType(self, pred: List[Tensor], target, is_train) -> dict:
+    def _comp_metrices_byTasksType(self, pred: list[Tensor], target, is_train) -> dict:
         """按照任务类别计算指标
 
         RDCVC 任务中，分为两类任务，一类是系统风量，一类是区域压差
@@ -277,7 +276,6 @@ class MetricsComputer:
 
         # ---------------------- 反归一化 (若对标签采取归一化) ----------------------
         # !!! 会破坏 tensor 的计算图
-        # !!! scale 内部会进行 x.numpy() 操作，会破坏 tensor 的计算图
         _pred = torch.cat(pred, dim=1)  # Tensor(batch_size, num_target)
         _pred = self.scaler.scale(_pred, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
         _target = self.scaler.scale(target, "y", is_train, mode=ScalerMode.INVERSE_NORMALIZATION).to("cpu")
@@ -294,7 +292,7 @@ class MetricsComputer:
         }
         return metrics
 
-    def _comp_metrics_byTarget(self, pred: Tuple[Tensor] | List[Tensor], target, is_train):
+    def _comp_metrics_byTarget(self, pred: tuple[Tensor] | list[Tensor], target, is_train):
         """按照每个目标计算指标"""
 
         # pred: Tuple(Tensor(batch_size, 1) * num_tasks)
@@ -333,7 +331,7 @@ class MetricsComputer:
             prefix + "rmse_rm_pres": self._calc_rmse(_pred[:, 4:10], _target[:, 4:10]),
         }
 
-    def _use_loss_weight(self, _loss: List[Tensor]) -> Tensor:
+    def _use_loss_weight(self, _loss: list[Tensor]) -> Tensor:
         """Use loss weight to compute loss."""
         assert all(_l.shape == () for _l in _loss), "Per loss must be a scalar."
         _weight = self.logger.recoder.loss_weight_buffer[-1, :]
