@@ -6,7 +6,8 @@
         "CVCNet",
         "trainer",
         "optimization",
-        "prediction"
+        "prediction",
+        "inference"
     ],
     "todo-tree.tree.scanMode": "workspace",
     "python.testing.pytestArgs": [
